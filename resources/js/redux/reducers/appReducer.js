@@ -1,8 +1,9 @@
-import { ADD_TAB, CLOSE_TAB, SET_ACTIVE_TAB, CHANGE_DATA, CHANGE_FOLDER, DELETE_ROW, ADD_ROW, CHANGE_COLLECTION_DATA, ADD_COLLECTION_ROW, DELETE_COLLECTION_ROW, REORDER_TABLE, SET_ACTIVE_ROW, INSERT_COLLECTION_ROW, REFETCH_TAB } from './../actions/ActionTypes';
+import { ADD_TAB, CLOSE_TAB, SET_ACTIVE_TAB, CHANGE_DATA, CHANGE_FOLDER, DELETE_ROW, ADD_ROW, CHANGE_COLLECTION_DATA, ADD_COLLECTION_ROW, DELETE_COLLECTION_ROW, REORDER_TABLE, SET_ACTIVE_ROW, INSERT_COLLECTION_ROW, REFETCH_TAB, SET_DRAWER_OPEN } from './../actions/ActionTypes';
 
 const initialState = {
   activeTab: -1,
   tabs: [],
+  drawerOpen: true,
   getTab(id) {
     return this.tabs.find(tab => tab.id === id)
   },
@@ -24,14 +25,14 @@ export const appReducer = (state = initialState, action) => {
       return { ...state, tabs };
     case CLOSE_TAB:
       if (action.tabId === activeTab) {
-        if (tabIndex===0) {
-          if (state.tabs.length>1) {
-            activeTab = state.tabs[tabIndex+1].id;
+        if (tabIndex === 0) {
+          if (state.tabs.length > 1) {
+            activeTab = state.tabs[tabIndex + 1].id;
           } else {
             activeTab = -1;
-          }        
+          }
         } else {
-          activeTab = state.tabs[tabIndex-1].id;
+          activeTab = state.tabs[tabIndex - 1].id;
         }
       }
       tabs.splice(tabIndex, 1);
@@ -39,8 +40,15 @@ export const appReducer = (state = initialState, action) => {
     case SET_ACTIVE_TAB:
       activeTab = action.tabId;
       return { ...state, activeTab };
+    case SET_DRAWER_OPEN:
+      return { ...state, drawerOpen: action.value };
     case SET_ACTIVE_ROW:
-      tabs[tabIndex].activeRow = action.activeRow;
+      if (action.clear) {
+        tabs[tabIndex].data.forEach(el => {
+          el.isActive = false;
+        })
+      }
+      tabs[tabIndex].data[action.rowIndex].isActive = true;
       return { ...state, tabs };
     case CHANGE_DATA:
       tabs[tabIndex].data[action.key] = action.value;

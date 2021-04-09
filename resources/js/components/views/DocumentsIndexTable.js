@@ -15,9 +15,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
   },
-  container: {
-    height: '90%',
-  },
+
   listItem: props => ({
     marginLeft: props.level * 18,
     color: '#3f51b5'

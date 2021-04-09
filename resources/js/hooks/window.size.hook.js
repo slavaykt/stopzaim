@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 export const useWindowSize = () => {
+  const { drawerOpen } = useSelector(state => state.app);
   const [tabContentSize, setTabContentSize] = useState({
+    width: undefined,
+    height: undefined,
+  });
+  const [indexTableSize, setIndexTableSize] = useState({
     width: undefined,
     height: undefined,
   });
@@ -13,8 +19,12 @@ export const useWindowSize = () => {
   useEffect(() => {
     const handleResize = () => {
       setTabContentSize({
-        width: window.innerWidth - 290,
+        width: window.innerWidth - 275,
         height: window.innerHeight - 150,
+      });
+      setIndexTableSize({
+        width: window.innerWidth - 290,
+        height: window.innerHeight - 150 - 80,
       });
       setCollectionTableSize({
         width: window.innerWidth - 290,
@@ -26,5 +36,6 @@ export const useWindowSize = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  return { tabContentSize, collectionTableSize };
+
+  return { tabContentSize: { ...tabContentSize, width: tabContentSize.width + Number(!drawerOpen) * 165 }, collectionTableSize, indexTableSize };
 }

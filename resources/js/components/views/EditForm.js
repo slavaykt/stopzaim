@@ -6,7 +6,7 @@ import views from '../views/views';
 import { TextField, Grid, InputLabel, FormControl, Typography, Select, Tabs, MenuItem, FormControlLabel, Checkbox, Tab, Snackbar } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
-import { Save as SaveIcon, ExitToApp as ExitToAppIcon, Cancel as CancelIcon, CheckCircle as CheckCircleIcon, Delete as DeleteIcon, Print as PrintIcon } from '@material-ui/icons';
+import { Save as SaveIcon, ExitToApp as ExitToAppIcon, Cancel as CancelIcon, CheckCircle as CheckCircleIcon, Delete as DeleteIcon, Print as PrintIcon, RssFeedRounded } from '@material-ui/icons';
 import { TabContext } from '../context';
 import EditCollectionTable from './EditCollectionTable';
 import SelectTable from './SelectTable';

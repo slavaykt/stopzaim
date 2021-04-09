@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import { compose, createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import { rootReducer } from '../redux/reducers/rootReducer';
 import Tabs from './layout/Tabs';
 import TabContent from './layout/TabContent';
@@ -10,8 +10,9 @@ import clsx from 'clsx';
 import { createMuiTheme, makeStyles, useTheme, ThemeProvider } from '@material-ui/core/styles';
 import { Drawer, List, CssBaseline, Divider, IconButton, ListItem, ListItemIcon, ListItemText, SvgIcon } from '@material-ui/core';
 import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon, People as PeopleIcon, Business as BusinessIcon, Settings as SettingsIcon, Equalizer as EqualizerIcon } from '@material-ui/icons';
-import { addTab, loadConfig } from '../redux/actions/actions';
+import { addTab, loadConfig, setDrawerOpen } from '../redux/actions/actions';
 import { CoinIcon, ContractIcon } from './Icons';
+import 'react-virtualized/styles.css';
 
 const drawerWidth = 240;
 
@@ -109,18 +110,18 @@ const App = () => {
   const dispatch = useDispatch();
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = useState(true);
+  const { drawerOpen } = useSelector(state => state.app);
 
   useLayoutEffect(() => {
     dispatch(loadConfig());
   }, []);
 
   const handleDrawerOpen = () => {
-    setOpen(true);
+    dispatch(setDrawerOpen(true));
   };
 
   const handleDrawerClose = () => {
-    setOpen(false);
+    dispatch(setDrawerOpen(false));
   };
 
   const handleDrawerItemClick = (option) => {
@@ -155,18 +156,18 @@ const App = () => {
       <Drawer
         variant="permanent"
         className={clsx(classes.drawer, {
-          [classes.drawerOpen]: open,
-          [classes.drawerClose]: !open,
+          [classes.drawerOpen]: drawerOpen,
+          [classes.drawerClose]: !drawerOpen,
         })}
         classes={{
           paper: clsx({
-            [classes.drawerOpen]: open,
-            [classes.drawerClose]: !open,
+            [classes.drawerOpen]: drawerOpen,
+            [classes.drawerClose]: !drawerOpen,
           }),
         }}
       >
         <div className={classes.toolbar}>
-          {!open
+          {!drawerOpen
             ?
             <IconButton className={classes.noFocus} onClick={handleDrawerOpen}>
               <ChevronRightIcon />

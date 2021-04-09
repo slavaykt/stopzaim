@@ -57,7 +57,14 @@ class CashIncomeOrderController extends Controller
 
   public function destroy($ids)
   {
-    CashIncomeOrder::destroy(explode(",", $ids));
+
+    logger('deleting..');
+    logger($ids);
+    try {
+      CashIncomeOrder::destroy(explode(",", $ids));
+    } catch (\Throwable $th) {
+      logger($th->getMessage());
+    };
     return response()->json(null, 204);
   }
 }

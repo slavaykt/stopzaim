@@ -14,6 +14,7 @@ const CashIncomeEdit = () => {
   const { data, sourceTabId } = useSelector(state => state.app.getTab(tabId));
   const enumerations = useSelector(state => state.config.enumerations);
   const baseApi = '/api/cash/orders/income';
+
   const [layout, setLayout] = useState(
     [
       {
