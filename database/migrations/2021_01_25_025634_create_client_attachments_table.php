@@ -17,7 +17,7 @@ class CreateClientAttachmentsTable extends Migration
             $table->id();
             $table->integer('client_id');
             $table->integer('Раздел');
-            $table->string('Наименование')->default("");
+            $table->string('Наименование',256)->default("");
         });
     }
 
