@@ -70,8 +70,6 @@ const EditForm = ({ layout, api, registerHandler, unRegisterHandler, printOption
     }
   }, [fetchedData]);
 
-  console.log(data);
-
   const SelectTableOnSubmit = (node) => (row) => {
     dispatch(changeData(tabId, node.key, { ...row }));
     if (node.onChangeHandler) {

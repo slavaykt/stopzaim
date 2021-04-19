@@ -15,7 +15,7 @@ class ClientController extends Controller
 
   public function index()
   {
-    return response(Client::orderBy('isGroup', 'desc')->orderBy('Наименование')->get(['isGroup','Наименование']), 200);
+    return response(Client::orderBy('isGroup', 'desc')->orderBy('Наименование')->get(['id','isGroup', 'parent_id', 'Наименование']), 200);
   }
 
   public function store(ClientRequest $request)
