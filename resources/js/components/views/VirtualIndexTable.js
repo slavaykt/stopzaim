@@ -1,12 +1,14 @@
 import { TableContainer } from '@material-ui/core';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AutoSizer, Column, Table } from 'react-virtualized';
 import useKeypress from '../../hooks/keyPress.hook';
 import { useWindowSize } from '../../hooks/window.size.hook';
-import { changeData, setActiveRow } from '../../redux/actions/actions';
+import { changeData, loadData, setActiveRow } from '../../redux/actions/actions';
 import { TabContext } from '../context';
+import useAxios from 'axios-hooks';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -40,14 +42,26 @@ const useStyles = makeStyles((theme) => ({
 function VirtualIndexTable({ doubleClickHandler, columns }) {
   const dispatch = useDispatch();
   const { tabId } = useContext(TabContext);
-  const { data } = useSelector(state => state.app.getTab(tabId));
+  const { data, api } = useSelector(state => state.app.getTab(tabId));
   const { indexTableSize } = useWindowSize();
   const classes = useStyles({ indexTableSize });
-  const sortedData = data.sort((prev, next) => {
-    const prevDate = new Date(prev.Дата).getTime();
-    const nextDate = new Date(next.Дата).getTime();
-    return prevDate - nextDate;
-  });
+  const [{ data: fetchedData, loading, error }, refetch] = useAxios(api);
+  const sortedData =
+    !data
+      ?
+      []
+      :
+      data.sort((prev, next) => {
+        const prevDate = new Date(prev.Дата).getTime();
+        const nextDate = new Date(next.Дата).getTime();
+        return prevDate - nextDate;
+      });
+
+  useEffect(() => {
+    if (fetchedData) {
+      dispatch(loadData(tabId, fetchedData));
+    }
+  }, [fetchedData]);
 
 
   const ctrlDown = useKeypress('Control');
@@ -80,32 +94,38 @@ function VirtualIndexTable({ doubleClickHandler, columns }) {
 
   return (
     <div className={classes.container}>
-      <AutoSizer>
-        {({ height, width }) => (
-          <Table
-            width={width}
-            height={height}
-            headerHeight={53}
-            headerClassName={classes.headerColumn}
-            rowClassName={getRowClassName}
-            gridClassName={classes.grid}
-            rowHeight={53}
-            rowCount={sortedData.length}
-            rowGetter={({ index }) => sortedData[index]}
-            onRowClick={handleClick}
-            onRowDoubleClick={doubleClickHandler}>
-            {columns.map(({ label, dataKey, width }) =>
-              <Column
-                key={dataKey}
-                label={label}
-                dataKey={dataKey}
-                width={width}
-                cellDataGetter={cellDataGetter}
-                cellRenderer={cellRenderer} />
-            )}
-          </Table>
-        )}
-      </AutoSizer>
+      {!data
+        ?
+        <LinearProgress />
+        :
+        <AutoSizer>
+          {({ height, width }) => (
+            <Table
+              width={width}
+              height={height}
+              headerHeight={53}
+              headerClassName={classes.headerColumn}
+              rowClassName={getRowClassName}
+              gridClassName={classes.grid}
+              rowHeight={53}
+              rowCount={sortedData.length}
+              rowGetter={({ index }) => sortedData[index]}
+              onRowClick={handleClick}
+              onRowDoubleClick={doubleClickHandler}>
+              {columns.map(({ label, dataKey, width }) =>
+                <Column
+                  key={dataKey}
+                  label={label}
+                  dataKey={dataKey}
+                  width={width}
+                  cellDataGetter={cellDataGetter}
+                  cellRenderer={cellRenderer} />
+              )}
+            </Table>
+          )}
+        </AutoSizer>
+      }
+
     </div>
   );
 }

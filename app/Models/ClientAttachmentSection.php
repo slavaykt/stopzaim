@@ -13,4 +13,9 @@ class ClientAttachmentSection extends Model
 
     public $timestamps = false;
 
+    public function attachments()
+    {
+      return $this->hasMany(ClientAttachment::class,'Раздел');
+    }
+
 }

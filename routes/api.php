@@ -7,6 +7,7 @@ use App\Http\Controllers\CashRegisterController;
 use App\Http\Controllers\ClientAttachmentSectionController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientSettlementRegisterController;
+use App\Http\Controllers\CollectingManagementController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ContractController;
 use App\Models\ClientSettlementRegister;
@@ -47,6 +48,8 @@ Route::resource('cash/orders/income', CashIncomeOrderController::class)->paramet
 Route::resource('cash/orders/expense', CashExpenseOrderController::class)->parameters([
   'expense' => 'cash_expense_order'
 ]);
+
+Route::resource('collectingManagement', CollectingManagementController::class)->only(['index','store']);
 
 Route::get('cash', [CashOrderController::class, 'index']);
 

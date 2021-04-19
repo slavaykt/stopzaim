@@ -15,6 +15,7 @@ class ClientController extends Controller
 
   public function index()
   {
+    sleep(2);
     return response(Client::orderBy('isGroup', 'desc')->orderBy('Наименование')->get(), 200);
   }
 
@@ -39,6 +40,7 @@ class ClientController extends Controller
 
   public function show(Client $client)
   {
+    sleep(3);
     try {
       return response()->json(new ClientResource($client), 200);
     } catch (\Throwable $th) {

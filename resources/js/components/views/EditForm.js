@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeData, closeTab, deleteRecord, refetchTab } from '../../redux/actions/actions';
+import { changeData, closeTab, deleteRecord, loadData, refetchTab } from '../../redux/actions/actions';
 import views from '../views/views';
 import { TextField, Grid, InputLabel, FormControl, Typography, Select, Tabs, MenuItem, FormControlLabel, Checkbox, Tab, Snackbar } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -14,6 +14,8 @@ import EditCollectionAccordion from './EditCollectionAccordion';
 import ConfirmableButton from './ConfirmableButton';
 import ExtendableButton from './ExtendableButton';
 import DropDownButton from './DropDownButton';
+import useAxios from 'axios-hooks';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -56,10 +58,19 @@ const EditForm = ({ layout, api, registerHandler, unRegisterHandler, printOption
   const dispatch = useDispatch();
   const { tabId, sourceTabId } = useContext(TabContext);
   const sourceTab = useSelector(state => state.app.getTab(sourceTabId));
-  const { data } = useSelector(state => state.app.getTab(tabId));
+  const { data, api: tabApi } = useSelector(state => state.app.getTab(tabId));
   const [activeTab, setActiveTab] = useState(0);
   const [error, setError] = useState('');
   const classes = useStyles();
+  const [{ data: fetchedData, loading, error: fetchError }, refetch] = useAxios(tabApi);
+
+  useEffect(() => {
+    if (fetchedData) {
+      dispatch(loadData(tabId, fetchedData));
+    }
+  }, [fetchedData]);
+
+  console.log(data);
 
   const SelectTableOnSubmit = (node) => (row) => {
     dispatch(changeData(tabId, node.key, { ...row }));
@@ -309,7 +320,14 @@ const EditForm = ({ layout, api, registerHandler, unRegisterHandler, printOption
         </ExtendableButton>
       </div>
       <Grid container spacing={1}>
-        {layout.map((node, nodeIndex) => renderNode(node, nodeIndex))}
+        {!data
+          ?
+          <Grid item xs={12}>
+            <LinearProgress />
+          </Grid>
+          :
+          layout.map((node, nodeIndex) => renderNode(node, nodeIndex))
+        }
       </Grid>
       <Snackbar open={!!error} autoHideDuration={6000} onClose={handleClearError}>
         <Alert onClose={handleClearError} severity="error">

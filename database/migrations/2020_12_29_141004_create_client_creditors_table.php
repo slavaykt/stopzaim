@@ -22,6 +22,7 @@ class CreateClientCreditorsTable extends Migration
           $table->double('СуммаВсего')->default(0);
           $table->double('СуммаЗадолженность')->default(0);
           $table->double('ШтрафыПени')->default(0);
+          $table->boolean('Наличие')->default(false);
           $table->timestamps();
         });
     }

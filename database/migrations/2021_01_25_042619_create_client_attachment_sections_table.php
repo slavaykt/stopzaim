@@ -20,6 +20,7 @@ class CreateClientAttachmentSectionsTable extends Migration
             $table->string('ТекстПриложения')->default("");
             $table->string('ТекстОтсутствиеПриложения')->default("");
             $table->integer('Порядок');
+            $table->boolean('КонтролироватьСбор')->default(false);
         });
     }
 

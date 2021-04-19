@@ -13,5 +13,6 @@ import CashIndex from './CashIndex';
 import ContractIndex from './ContractIndex';
 import ContractEdit from './ContractEdit';
 import SettlemenTReport from './SettlemenTReport';
+import СollectingManagement from './СollectingManagement';
 
-export default { ClientIndex, ClientEdit, CompanyIndex, CompanyEdit, ClientAttachmentSectionSetup, PassportComponent, AddressComponent, CashIncomeIndex, CashIncomeEdit, CashExpenseIndex, CashExpenseEdit, CashIndex, ContractIndex, ContractEdit, SettlemenTReport }
+export default { ClientIndex, ClientEdit, CompanyIndex, CompanyEdit, ClientAttachmentSectionSetup, PassportComponent, AddressComponent, CashIncomeIndex, CashIncomeEdit, CashExpenseIndex, CashExpenseEdit, CashIndex, ContractIndex, ContractEdit, SettlemenTReport, СollectingManagement }

@@ -14,3 +14,4 @@ export const REORDER_TABLE = 'REORDER_TABLE';
 export const LOAD_CONFIG = 'LOAD_CONFIG';
 export const REFETCH_TAB = 'REFETCH_TAB';
 export const SET_DRAWER_OPEN = 'SET_DRAWER_OPEN';
+export const LOAD_DATA = 'LOAD_DATA';

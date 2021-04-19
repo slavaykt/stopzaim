@@ -1,23 +1,41 @@
 import Axios from 'axios';
-import { ADD_COLLECTION_ROW, ADD_TAB, CLOSE_TAB, ADD_ROW, CHANGE_COLLECTION_DATA, CHANGE_DATA, CHANGE_FOLDER, DELETE_COLLECTION_ROW, DELETE_ROW, INSERT_COLLECTION_ROW, LOAD_CONFIG, REORDER_TABLE, SET_ACTIVE_ROW, SET_ACTIVE_TAB, REFETCH_TAB, SET_DRAWER_OPEN } from './ActionTypes';
+import { ADD_COLLECTION_ROW, ADD_TAB, CLOSE_TAB, ADD_ROW, CHANGE_COLLECTION_DATA, CHANGE_DATA, CHANGE_FOLDER, DELETE_COLLECTION_ROW, DELETE_ROW, INSERT_COLLECTION_ROW, LOAD_CONFIG, REORDER_TABLE, SET_ACTIVE_ROW, SET_ACTIVE_TAB, REFETCH_TAB, SET_DRAWER_OPEN, LOAD_DATA } from './ActionTypes';
 import { v4 as uuidv4 } from 'uuid';
 
 export const addTab = (label, api, componentName, sourceTabId) => {
-  return async dispatch => {
-    let data = [];
-    if (api) {
-      const response = await Axios.get(api);
-      data = await response.data;
+  const id = uuidv4();
+  return (
+    {
+      type: ADD_TAB,
+      tab: { id, label, componentName, api, sourceTabId }
     }
-    const id = uuidv4();
-    dispatch(
-      {
-        type: ADD_TAB,
-        tab: { id, label, componentName, data, api, sourceTabId }
-      }
-    )
-  }
+  )
+  // return async dispatch => {
+  //   let data = [];
+  //   if (api) {
+  //     const response = await Axios.get(api);
+  //     data = await response.data;
+  //   }
+  //   const id = uuidv4();
+  //   dispatch(
+  //     {
+  //       type: ADD_TAB,
+  //       tab: { id, label, componentName, data, api, sourceTabId }
+  //     }
+  //   )
+  // }
 }
+
+export const loadData = (tabId, data) => {
+  const id = uuidv4();
+  return (
+    {
+      type: LOAD_DATA,
+      tabId, data
+    }
+  )
+}
+
 
 export const refetchTab = (tab) => {
   return async dispatch => {

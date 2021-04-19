@@ -1,8 +1,8 @@
 import { faFolder, faFolderOpen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useContext, useState, Fragment } from 'react';
+import React, { useContext, useState, Fragment, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addTab, addRow, changeFolder, deleteRow } from '../../redux/actions/actions';
+import { addTab, addRow, changeFolder, deleteRow, loadData } from '../../redux/actions/actions';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, TextField, Dialog, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemIcon, ListItemText, Collapse } from '@material-ui/core';
 import { AddCircle as AddCircleIcon, CreateNewFolder as NewFolderIcon, Folder as FolderIcon, ArrowRight as ArrowRightIcon, ArrowForward as ArrowForwardIcon, Delete as DeleteIcon } from '@material-ui/icons';
@@ -10,6 +10,8 @@ import { TabContext } from '../context';
 import DialogWrapper from './DialogWrapper';
 import ExtendableButton from './ExtendableButton';
 import ConfirmableButton from './ConfirmableButton';
+import useAxios from 'axios-hooks';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -313,7 +315,7 @@ const MoveToFolderDialog = ({ rowIds, api }) => {
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <List component="div" >
-                {data.filter(item => item.isGroup && item.parent_id === null)
+                {data && data.filter(item => item.isGroup && item.parent_id === null)
                   .map(item =>
                     <FolderListItem
                       item={item}
@@ -339,6 +341,13 @@ const IndexTable = () => {
   const [activeRowsIds, setActiveRowsIds] = useState([]);
   const [ctrlDown, setCtrlDown] = useState(false);
   const classes = useStyles();
+  const [{ data: fetchedData, loading, error }, refetch] = useAxios(api);
+
+  useEffect(() => {
+    if (fetchedData) {
+      dispatch(loadData(tabId, fetchedData));
+    }
+  }, [fetchedData]);
 
   const handleCreate = () => {
     dispatch(addTab(editInfo.newTabName, api + '/create', editInfo.component, tabId));
@@ -429,28 +438,36 @@ const IndexTable = () => {
           </TableHead>
           <TableBody>
             {
-              data.map(row => {
-                if (row.parent_id !== null) return;
-                return (
-                  <Fragment key={row.id}>
-                    {row.isGroup
-                      ?
-                      <FolderRow
-                        row={row}
-                        activeRowsIds={activeRowsIds}
-                        setActive={handleActiveRow}
-                        level={0} />
-                      :
-                      <Row
-                        row={row}
-                        activeRowsIds={activeRowsIds}
-                        setActive={handleActiveRow}
-                        level={0} />
-                    }
-                  </Fragment>
+              !data
+                ?
+                <tr>
+                  <td colSpan={columns.length}>
+                    <LinearProgress />
+                  </td>
+                </tr>
+                :
+                data.map(row => {
+                  if (row.parent_id !== null) return;
+                  return (
+                    <Fragment key={row.id}>
+                      {row.isGroup
+                        ?
+                        <FolderRow
+                          row={row}
+                          activeRowsIds={activeRowsIds}
+                          setActive={handleActiveRow}
+                          level={0} />
+                        :
+                        <Row
+                          row={row}
+                          activeRowsIds={activeRowsIds}
+                          setActive={handleActiveRow}
+                          level={0} />
+                      }
+                    </Fragment>
+                  )
+                }
                 )
-              }
-              )
             }
           </TableBody>
         </Table>

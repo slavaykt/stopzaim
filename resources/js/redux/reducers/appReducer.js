@@ -1,4 +1,4 @@
-import { ADD_TAB, CLOSE_TAB, SET_ACTIVE_TAB, CHANGE_DATA, CHANGE_FOLDER, DELETE_ROW, ADD_ROW, CHANGE_COLLECTION_DATA, ADD_COLLECTION_ROW, DELETE_COLLECTION_ROW, REORDER_TABLE, SET_ACTIVE_ROW, INSERT_COLLECTION_ROW, REFETCH_TAB, SET_DRAWER_OPEN } from './../actions/ActionTypes';
+import { ADD_TAB, CLOSE_TAB, SET_ACTIVE_TAB, CHANGE_DATA, CHANGE_FOLDER, DELETE_ROW, ADD_ROW, CHANGE_COLLECTION_DATA, ADD_COLLECTION_ROW, DELETE_COLLECTION_ROW, REORDER_TABLE, SET_ACTIVE_ROW, INSERT_COLLECTION_ROW, REFETCH_TAB, SET_DRAWER_OPEN, LOAD_DATA } from './../actions/ActionTypes';
 
 const initialState = {
   activeTab: -1,
@@ -20,6 +20,9 @@ export const appReducer = (state = initialState, action) => {
     case ADD_TAB:
       activeTab = action.tab.id;
       return { ...state, tabs: state.tabs.concat(action.tab), activeTab };
+    case LOAD_DATA:
+      tabs[tabIndex].data = action.data;
+      return { ...state, tabs };
     case REFETCH_TAB:
       tabs[tabIndex].data = action.data;
       return { ...state, tabs };

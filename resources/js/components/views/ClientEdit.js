@@ -678,18 +678,23 @@ const ClientEdit = () => {
     }
   }, [attachmentSection])
 
-  const printOptions = [
-    { label: 'Заявление', url: `/print/clients/${data.id}/application` },
-    { label: 'Список кредиторов и должников', url: `/print/clients/${data.id}/creditorsList` },
-    { label: 'Опись имущества',url: `/print/clients/${data.id}/propertyList` },
-  ];
+  const printOptions =
+    !data
+      ?
+      []
+      :
+      [
+        { label: 'Заявление', url: `/print/clients/${data.id}/application` },
+        { label: 'Список кредиторов и должников', url: `/print/clients/${data.id}/creditorsList` },
+        { label: 'Опись имущества', url: `/print/clients/${data.id}/propertyList` },
+      ];
 
 
   if (loading) {
     return <CircularProgress />
   } else {
     return (
-      <TabContext.Provider value={{...tabContext, sourceTabId }}>
+      <TabContext.Provider value={{ ...tabContext, sourceTabId }}>
         <EditForm
           layout={layout}
           printOptions={printOptions}

@@ -1,7 +1,7 @@
 import Axios from 'axios';
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addCollectionRow, changeCollectionData, changeData, deleteCollectionRow } from '../../redux/actions/actions';
+import { addCollectionRow, changeCollectionData, changeData, deleteCollectionRow, loadData } from '../../redux/actions/actions';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { useWindowSize } from '../../hooks/window.size.hook';
 import { TabContext } from '../context';
@@ -19,6 +19,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import ContentEditable from './ContentEditable';
+import useAxios from 'axios-hooks';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -59,23 +61,22 @@ const EditableTable = ({ columns }) => {
 
   const dispatch = useDispatch();
   const { tabId } = useContext(TabContext);
-  console.log(tabId);
-  const { data, default: def } = useSelector(state => state.app.getTab(tabId).data);
+  const { data: dataObject, api } = useSelector(state => state.app.getTab(tabId));
+  const data = dataObject && dataObject.data;
+  const def = dataObject && dataObject.default;
   const [activeRow, setActiveRow] = useState(null);
   const classes = useStyles();
   const tblRef = useRef(null);
   const tbodyRef = useRef(null);
   const windowSize = useWindowSize();
+  const [{ data: fetchedData, loading, error }, refetch] = useAxios(api);
 
-  // let scrollWidth = 8;
-  // if (tblRef.current) {
-  //   const tblCs = window.getComputedStyle(tblRef.current, null);
-  //   scrollWidth = parseInt(windowSize.width, 10) - 270 - parseInt(tblCs.width, 10);
-  // }
+  useEffect(() => {
+    if (fetchedData) {
+      dispatch(loadData(tabId, { data: fetchedData.data.sort((prev, next) => prev.Порядок - next.Порядок), default: fetchedData.default }));
+    }
+  }, [fetchedData]);
 
-  data.sort((prev, next) => prev.Порядок - next.Порядок);
-
-  console.log(data);
 
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowUp') {
@@ -196,27 +197,36 @@ const EditableTable = ({ columns }) => {
             </TableRow>
           </TableHead>
           <TableBody ref={tbodyRef}>
-            {data.map((row, rowIndex) => {
-              if (row.delete) return false;
-              return (
-                <TableRow
-                  key={rowIndex}
-                  onClick={() => setActiveRow(rowIndex)}
-                  className={rowIndex === activeRow ? classes.activeRow : ''}
-                  tabIndex={-1}>
-                  {columns.map((column, columnIndex) =>
-                    <TableCell className={classes.tableCell} key={columnIndex}>
-                      <ContentEditable
-                        collection="data"
-                        name={column.key}
-                        rowIndex={rowIndex}
-                        value={row[column.key]} />
-                    </TableCell>
-                  )}
-                </TableRow>
-              )
-            }
-            )}
+            {
+              !data
+                ?
+                <tr>
+                  <td colSpan={columns.length}>
+                    <LinearProgress />
+                  </td>
+                </tr>
+                :
+                data.map((row, rowIndex) => {
+                  if (row.delete) return false;
+                  return (
+                    <TableRow
+                      key={rowIndex}
+                      onClick={() => setActiveRow(rowIndex)}
+                      className={rowIndex === activeRow ? classes.activeRow : ''}
+                      tabIndex={-1}>
+                      {columns.map((column, columnIndex) =>
+                        <TableCell className={classes.tableCell} key={columnIndex}>
+                          <ContentEditable
+                            collection="data"
+                            name={column.key}
+                            rowIndex={rowIndex}
+                            value={row[column.key]} />
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  )
+                }
+                )}
           </TableBody>
         </Table>
       </TableContainer>

@@ -16,6 +16,11 @@ class ClientCreditor extends Model
       return $this->belongsTo(Company::class, 'Кредитор');
     }
 
+    public function client()
+    {
+      return $this->belongsTo(Client::class);
+    }
+
     protected $attributes = [
       'id' => null,
       'client_id' => null,
