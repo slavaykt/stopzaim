@@ -53,16 +53,17 @@ const Alert = (props) => {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const EditForm = ({ layout, api, registerHandler, unRegisterHandler, printOptions }) => {
+function EditForm({ layout, api, registerHandler, unRegisterHandler, printOptions }) {
 
   const dispatch = useDispatch();
   const { tabId, sourceTabId } = useContext(TabContext);
   const sourceTab = useSelector(state => state.app.getTab(sourceTabId));
   const { data, api: tabApi } = useSelector(state => state.app.getTab(tabId));
   const [activeTab, setActiveTab] = useState(0);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const classes = useStyles();
-  const [{ data: fetchedData, loading, error: fetchError }, refetch] = useAxios(tabApi);
+  const [{ data: fetchedData, loading, error: fetchError }, refetch] = useAxios(tabApi, { useCache: false });
 
   useEffect(() => {
     if (fetchedData) {
@@ -73,12 +74,12 @@ const EditForm = ({ layout, api, registerHandler, unRegisterHandler, printOption
   const SelectTableOnSubmit = (node) => (row) => {
     dispatch(changeData(tabId, node.key, { ...row }));
     if (node.onChangeHandler) {
-      node.onChangeHandler({ ...row });
+      node.onChangeHandler(data, { ...row });
     }
   }
 
   const renderNode = (node, nodeIndex) => {
-    if (node.hideHandler && node.hideHandler()) return false;
+    if (node.hideHandler && node.hideHandler(data)) return false;
     return (
       <Grid key={nodeIndex} item xs={node.size}>
         {
@@ -211,12 +212,13 @@ const EditForm = ({ layout, api, registerHandler, unRegisterHandler, printOption
       dispatch(changeData(tabId, e.target.name, e.target.value));
     }
     if (onChangeHandler) {
-      onChangeHandler(e.target.value);
+      onChangeHandler(data, e.target.value);
     }
   }
 
   const handleSubmit = (register) => async (e) => {
     e.preventDefault();
+    setSaving(true);
     const res = data.id ? await Axios.put(api + '/' + String(data.id), data) : await Axios.post(api, data);
     if (res.status === 200 || res.status === 201) {
       const resData = await res.data;
@@ -234,6 +236,7 @@ const EditForm = ({ layout, api, registerHandler, unRegisterHandler, printOption
         }
         dispatch(refetchTab(sourceTab));
       }
+      setSaving(false);
     }
   }
 
@@ -264,6 +267,14 @@ const EditForm = ({ layout, api, registerHandler, unRegisterHandler, printOption
     }
     setError('');
   };
+
+  if (!data) {
+    return (
+      <Grid item xs={12}>
+        <LinearProgress />
+      </Grid>
+    )
+  }
 
   return (
     <form >
@@ -318,14 +329,11 @@ const EditForm = ({ layout, api, registerHandler, unRegisterHandler, printOption
         </ExtendableButton>
       </div>
       <Grid container spacing={1}>
-        {!data
-          ?
+        {saving &&
           <Grid item xs={12}>
             <LinearProgress />
-          </Grid>
-          :
-          layout.map((node, nodeIndex) => renderNode(node, nodeIndex))
-        }
+          </Grid>}
+        {layout.map((node, nodeIndex) => renderNode(node, nodeIndex))}
       </Grid>
       <Snackbar open={!!error} autoHideDuration={6000} onClose={handleClearError}>
         <Alert onClose={handleClearError} severity="error">

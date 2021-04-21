@@ -50,8 +50,8 @@ const CashExpenseEdit = () => {
         key: 'Клиент',
         size: 12,
         api: '/api/clients',
-        hideHandler: () => {
-          return data.ВидОперации === 'Прочий расход'
+        hideHandler: (data) => {
+          return data.ВидОперации === 'Прочий расход';
         }
       },
       {

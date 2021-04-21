@@ -47,10 +47,11 @@ const CashIncomeEdit = () => {
         key: 'Клиент',
         size: 12,
         api: '/api/clients',
-        hideHandler: () => {
+        hideHandler: (data) => {
           return data.ВидОперации === 'Прочее поступление'
         },
-        onChangeHandler: (client) => {
+        onChangeHandler: (data, client) => {
+          console.log(data);
           if (!data.ПринятоОт) {
             dispatch(changeData(tabId, 'ПринятоОт', client.Наименование));
           }
@@ -177,7 +178,7 @@ const CashIncomeEdit = () => {
   const printOptions = [];
 
   return (
-    <TabContext.Provider value={{...tabContext, sourceTabId }}>
+    <TabContext.Provider value={{ ...tabContext, sourceTabId }}>
       <EditForm
         layout={layout}
         printOptions={printOptions}

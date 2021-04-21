@@ -91,9 +91,10 @@ function ListItem_({ item, handleCheck, showChecked }) {
 function СollectingManagement() {
   const { tabId } = useContext(TabContext);
   const { api } = useSelector(state => state.app.getTab(tabId));
-  const [{ data: fetchedData, loading, error: fetchError }, refetch] = useAxios(api);
+  const [{ data: fetchedData, loading, error: fetchError }, refetch] = useAxios(api, { useCache: false });
   const [data, setData] = useState(null);
   const [showChecked, setShowChecked] = useState(true);
+  const [saving, setSaving] = useState(false);
   const classes = useStyles();
 
   useEffect(() => {
@@ -137,10 +138,12 @@ function СollectingManagement() {
   }
 
   const handleSubmit = async () => {
+    setSaving(true);
     const res = await axios.post(api, data);
     if (res.status === 200) {
       console.log('успешно записано!');
     }
+    setSaving(false);
   }
 
   if (!data) {
@@ -149,6 +152,7 @@ function СollectingManagement() {
 
   return (
     <>
+      {saving && <LinearProgress />}
       <AppBar color="inherit" position="sticky" className={classes.appbar}>
         <h3>Контроль сбора документов</h3>
         <div className={classes.buttonGroup}>

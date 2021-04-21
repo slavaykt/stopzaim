@@ -341,7 +341,7 @@ const IndexTable = () => {
   const [activeRowsIds, setActiveRowsIds] = useState([]);
   const [ctrlDown, setCtrlDown] = useState(false);
   const classes = useStyles();
-  const [{ data: fetchedData, loading, error }, refetch] = useAxios(api);
+  const [{ data: fetchedData, loading, error }, refetch] = useAxios(api, { useCache: false });
 
   useEffect(() => {
     if (fetchedData) {

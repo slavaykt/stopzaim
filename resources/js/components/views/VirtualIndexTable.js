@@ -45,7 +45,7 @@ function VirtualIndexTable({ doubleClickHandler, columns }) {
   const { data, api } = useSelector(state => state.app.getTab(tabId));
   const { indexTableSize } = useWindowSize();
   const classes = useStyles({ indexTableSize });
-  const [{ data: fetchedData, loading, error }, refetch] = useAxios(api);
+  const [{ data: fetchedData, loading, error }, refetch] = useAxios(api, { useCache: false });
   const sortedData =
     !data
       ?

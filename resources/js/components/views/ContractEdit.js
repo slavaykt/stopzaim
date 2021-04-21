@@ -63,7 +63,7 @@ const ContractEdit = () => {
             key: 'Сумма',
             type: 'number',
             width: '100px',
-            onChangeHandler: (rowIndex, value) => {
+            onChangeHandler: (data, rowIndex, value) => {
               const total = data.ГрафикПлатежей.reduce((prev, el) => {
                 return prev + el.Сумма;
               }, 0);
@@ -139,12 +139,17 @@ const ContractEdit = () => {
     }
   }
 
-  const printOptions = [
-    { label: 'Договор', url: `/print/contract/${data.id}` },
-  ];
+  const printOptions =
+    !data
+      ?
+      []
+      :
+      [
+        { label: 'Договор', url: `/print/contract/${data.id}` },
+      ];
 
   return (
-    <TabContext.Provider value={{...tabContext, sourceTabId }}>
+    <TabContext.Provider value={{ ...tabContext, sourceTabId }}>
       <EditForm
         layout={layout}
         printOptions={printOptions}

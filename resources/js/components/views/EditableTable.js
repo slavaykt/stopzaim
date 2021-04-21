@@ -69,7 +69,8 @@ const EditableTable = ({ columns }) => {
   const tblRef = useRef(null);
   const tbodyRef = useRef(null);
   const windowSize = useWindowSize();
-  const [{ data: fetchedData, loading, error }, refetch] = useAxios(api);
+  const [{ data: fetchedData, loading, error }, refetch] = useAxios(api, { useCache: false });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (fetchedData) {
@@ -130,17 +131,24 @@ const EditableTable = ({ columns }) => {
     }
   }
 
-  const handleSubmit = () => {
-    Axios.post('api/attachment/sections', { data })
-      .then(response => {
-        if (response.status === 201) {
-          console.log('request', response.data);
-        }
-      });
+  const handleSubmit = async () => {
+    setSaving(true);
+    const response = await Axios.post('api/attachment/sections', { data });
+    if (response.status === 201) {
+      console.log('request', response.data);
+    };
+    setSaving(false);
+  }
+
+  if (!data) {
+    return (
+      <LinearProgress />
+    )
   }
 
   return (
     <>
+      {saving && <LinearProgress />}
       <div className={classes.buttonGroup}>
         <CustomButton
           variant="contained"
@@ -197,36 +205,27 @@ const EditableTable = ({ columns }) => {
             </TableRow>
           </TableHead>
           <TableBody ref={tbodyRef}>
-            {
-              !data
-                ?
-                <tr>
-                  <td colSpan={columns.length}>
-                    <LinearProgress />
-                  </td>
-                </tr>
-                :
-                data.map((row, rowIndex) => {
-                  if (row.delete) return false;
-                  return (
-                    <TableRow
-                      key={rowIndex}
-                      onClick={() => setActiveRow(rowIndex)}
-                      className={rowIndex === activeRow ? classes.activeRow : ''}
-                      tabIndex={-1}>
-                      {columns.map((column, columnIndex) =>
-                        <TableCell className={classes.tableCell} key={columnIndex}>
-                          <ContentEditable
-                            collection="data"
-                            name={column.key}
-                            rowIndex={rowIndex}
-                            value={row[column.key]} />
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  )
-                }
-                )}
+            {data.map((row, rowIndex) => {
+              if (row.delete) return false;
+              return (
+                <TableRow
+                  key={rowIndex}
+                  onClick={() => setActiveRow(rowIndex)}
+                  className={rowIndex === activeRow ? classes.activeRow : ''}
+                  tabIndex={-1}>
+                  {columns.map((column, columnIndex) =>
+                    <TableCell className={classes.tableCell} key={columnIndex}>
+                      <ContentEditable
+                        collection="data"
+                        name={column.key}
+                        rowIndex={rowIndex}
+                        value={row[column.key]} />
+                    </TableCell>
+                  )}
+                </TableRow>
+              )
+            }
+            )}
           </TableBody>
         </Table>
       </TableContainer>

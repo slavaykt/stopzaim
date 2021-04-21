@@ -86,6 +86,7 @@ const EditCollectionTable = ({ columns, collection }) => {
   const dispatch = useDispatch();
   const { tabId } = useContext(TabContext);
   const [activeRow, setActiveRow] = useState(null);
+  const { data: allData } = useSelector(state => state.app.getTab(tabId));
   const data = useSelector(state => state.app.getTab(tabId).data[collection]);
   const schema = useSelector(state => state.app.getTab(tabId).data.schema[collection]);
   const { collectionTableSize } = useWindowSize();
@@ -100,7 +101,7 @@ const EditCollectionTable = ({ columns, collection }) => {
     console.log(e.target.value);
     dispatch(changeCollectionData(tabId, collection, rowIndex, e.target.name, payload));
     if (onChangeHandler) {
-      onChangeHandler(rowIndex, e.target.value);
+      onChangeHandler(allData, rowIndex, e.target.value);
     }
   }
 
@@ -153,7 +154,7 @@ const EditCollectionTable = ({ columns, collection }) => {
   const SelectTableOnSubmit = (node, rowIndex) => (row) => {
     dispatch(changeCollectionData(tabId, collection, rowIndex, node.key, { ...row }));
     if (node.onChangeHandler) {
-      node.onChangeHandler({ ...row });
+      node.onChangeHandler(allData, { ...row });
     }
   }
 
