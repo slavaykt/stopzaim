@@ -32,7 +32,7 @@ class Address extends Model
     'ДомПоиск' => '',
   ];
 
-  public function toString()
+  public function getStringAttribute($value)
   {
     $addressString = '';
     if ($this->Индекс) {

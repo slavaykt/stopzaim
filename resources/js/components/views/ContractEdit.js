@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { changeCollectionData, changeData, handleRegister, setLayout } from '../../redux/actions/actions';
 import { TabContext } from '../context';
 import axios from 'axios';
+import { useRegisterHandler } from '../../hooks/register.handlers.hook';
 
 
 const ContractEdit = () => {
@@ -14,6 +15,7 @@ const ContractEdit = () => {
   const { tabId } = tabContext;
   const { data, sourceTabId } = useSelector(state => state.app.getTab(tabId));
   const enumerations = useSelector(state => state.config.enumerations);
+  const { contractRegisterHandler, contractUnregisterHandler } = useRegisterHandler();
   const baseApi = '/api/contracts';
   const [layout, setLayout] = useState(
     [
@@ -82,63 +84,6 @@ const ContractEdit = () => {
     ]
   );
 
-  const registerHandler = async () => {
-    if (!data.Клиент) return;
-    const payload = {
-      method: 'updateOrCreate',
-      registerable_type: "App\\Models\\Contract",
-      registerable_id: data.id,
-      startDate: data.ГрафикПлатежей.reduce((result, el) => {
-        if (result) {
-          return el.Дата < result ? el.Дата : result;
-        } else {
-          return el.Дата;
-        }
-      }, null),
-      data: data.ГрафикПлатежей.map(el => (
-        {
-          Дата: el.Дата,
-          Клиент: data.Клиент.id,
-          СуммаПриход: el.Сумма,
-          registerable_type: "App\\Models\\Contract",
-          registerable_id: data.id,
-        }
-      ))
-    };
-    const res = await axios.post('api/client_settlement_register', payload);
-    if (res.status === 201) {
-      await dispatch(handleRegister(tabId, baseApi, data, 1));
-    }
-  }
-
-  const unRegisterHandler = async () => {
-    const payload = {
-      method: 'delete',
-      registerable_type: "App\\Models\\Contract",
-      registerable_id: data.id,
-      startDate: data.ГрафикПлатежей.reduce((result, el) => {
-        if (result) {
-          return el.Дата < result ? el.Дата : result;
-        } else {
-          return el.Дата;
-        }
-      }, null),
-      data: data.ГрафикПлатежей.map(el => (
-        {
-          Дата: el.Дата,
-          Клиент: data.Клиент.id,
-          СуммаПриход: el.Сумма,
-          registerable_type: "App\\Models\\Contract",
-          registerable_id: data.id,
-        }
-      ))
-    }
-    const res = await axios.post('api/client_settlement_register', payload);
-    if (res.status === 201) {
-      await dispatch(handleRegister(tabId, baseApi, data, 0));
-    }
-  }
-
   const printOptions =
     !data
       ?
@@ -153,8 +98,8 @@ const ContractEdit = () => {
       <EditForm
         layout={layout}
         printOptions={printOptions}
-        registerHandler={registerHandler}
-        unRegisterHandler={unRegisterHandler}
+        registerHandler={contractRegisterHandler}
+        unRegisterHandler={contractUnregisterHandler}
         api={baseApi} />
     </TabContext.Provider>
   )

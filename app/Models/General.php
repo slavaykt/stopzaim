@@ -11,6 +11,35 @@ class General extends Model
 {
   use HasFactory;
 
+  private function dateFormat($dateString)
+  {
+    return date("d.m.Y", strtotime($dateString));
+  }
+
+  private function is_Date($str)
+  {
+    return is_numeric(strtotime($str));
+  }
+
+  public function printValue($path)
+  {
+    $slugs = explode(".", $path);
+    $val = $this;
+    $prop = "";
+    foreach ($slugs as $slug) {
+      $val = $val->$slug;
+      $prop = $prop . '.' . $slug;
+      if (empty($val)) {
+        return "<span class='error'>$prop отсутствует</span>";
+      }
+    }
+    if ($this->is_Date($val)) {
+      return $this->dateFormat($val);
+    } else {
+      return $val;
+    }  
+  }
+
   protected static function boot()
   {
     parent::boot();
@@ -20,7 +49,7 @@ class General extends Model
       DB::transaction(function () use ($request, $model) {
         if ($request['Адрес']) {
           $transformed_address = transform_address($request['Адрес']);
-          $model->address()->updateOrCreate(array_only($transformed_address, ['id']), array_except($transformed_address, ['id'])); 
+          $model->address()->updateOrCreate(array_only($transformed_address, ['id']), array_except($transformed_address, ['id']));
         }
         if ($request['Паспорт']) {
           $model->passport()->updateOrCreate(array_only($request['Паспорт'], ['id']), array_except($request['Паспорт'], ['id']));

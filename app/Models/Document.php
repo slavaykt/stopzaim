@@ -19,12 +19,13 @@ class Document extends General
     static::creating(function ($document) {
       $startOfPeriod = Carbon::createFromTimeString($document->Дата)->startOfYear()->toDateTimeString();
       $endOfPeriod = Carbon::createFromTimeString($document->Дата)->endOfYear()->toDateTimeString();
+      logger($document->Номер);
       if (!$document->Номер) {
         $last_num = get_class($document)::whereBetween('Дата', [$startOfPeriod, $endOfPeriod])->orderBy('Номер', 'asc')->get()->last();
         $document->Номер = $last_num ? $last_num->Номер + 1 : 1;
       } else {
         $duplicates =  get_class($document)::whereBetween('Дата', [$startOfPeriod, $endOfPeriod])->where('Номер', $document->Номер)->count();
-        if ($duplicates > 0) {
+        if ($duplicates > 0) { 
           $document->Комментарий = 'Номер не уникальный';
           return false;
         }

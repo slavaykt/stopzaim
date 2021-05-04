@@ -18,13 +18,16 @@ class Passport extends Model
     'Серия' => '',
     'Номер' => '',
     'КемВыдано' => '',
-    'ДатаВыдачи' =>  '0001-01-01',
+    'ДатаВыдачи' =>  null,
     'КодПодразделения' => '',
   ];
 
-  public function toString()
+  public function getStringAttribute($value)
   {
     $issueDate = date("d.m.Y",strtotime($this->ДатаВыдачи));
+    if (empty($this->Серия.$this->Номер)) {
+      return "";
+    }
     return <<<EOT
       паcпорт гражданина РФ серия $this->Серия номер $this->Номер, выданный $issueDate $this->КемВыдано код подр. $this->КодПодразделения
       EOT;

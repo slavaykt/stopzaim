@@ -7,7 +7,6 @@ import useKeypress from '../../hooks/keyPress.hook';
 import { useWindowSize } from '../../hooks/window.size.hook';
 import { changeData, loadData, setActiveRow } from '../../redux/actions/actions';
 import { TabContext } from '../context';
-import useAxios from 'axios-hooks';
 import LinearProgress from '@material-ui/core/LinearProgress';
 
 const useStyles = makeStyles((theme) => ({
@@ -39,13 +38,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function VirtualIndexTable({ doubleClickHandler, columns }) {
+function VirtualIndexTable({ doubleClickHandler, columns, loading }) {
   const dispatch = useDispatch();
   const { tabId } = useContext(TabContext);
-  const { data, api } = useSelector(state => state.app.getTab(tabId));
+  const { data } = useSelector(state => state.app.getTab(tabId));
   const { indexTableSize } = useWindowSize();
   const classes = useStyles({ indexTableSize });
-  const [{ data: fetchedData, loading, error }, refetch] = useAxios(api, { useCache: false });
   const sortedData =
     !data
       ?
@@ -56,13 +54,6 @@ function VirtualIndexTable({ doubleClickHandler, columns }) {
         const nextDate = new Date(next.Дата).getTime();
         return prevDate - nextDate;
       });
-
-  useEffect(() => {
-    if (fetchedData) {
-      dispatch(loadData(tabId, fetchedData));
-    }
-  }, [fetchedData]);
-
 
   const ctrlDown = useKeypress('Control');
 
@@ -94,10 +85,8 @@ function VirtualIndexTable({ doubleClickHandler, columns }) {
 
   return (
     <div className={classes.container}>
-      {!data
-        ?
-        <LinearProgress />
-        :
+      {loading && <LinearProgress />}
+      {data &&
         <AutoSizer>
           {({ height, width }) => (
             <Table

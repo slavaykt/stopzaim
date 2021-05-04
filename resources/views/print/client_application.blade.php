@@ -30,13 +30,13 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
         677980, Саха /Якутия/ Респ, Якутск г, Курашова ул, Дом №28
       </p>
       <p>
-        Заявитель: {{$client->Наименование}}
-        Адрес регистрации: {{$client->Адрес}}
-        Тел. {{$client->Телефон}}
+        Заявитель: {!!$client->printValue('Наименование')!!}
+        Адрес регистрации: {!!$client->printValue('address.string')!!}
+        Тел. {!!$client->printValue('Телефон')!!}
       </p>
       @foreach ($client->creditors as $creditor)
       <p>
-        Кредитор: {{$creditor->creditor->Наименование}}, {{$creditor->creditor->Адрес}}
+        Кредитор: {!!$creditor->creditor->printValue('Наименование')!!}, {!!$creditor->creditor->printValue('address.string')!!}
       </p>
       @endforeach
       <p>
@@ -53,16 +53,15 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
     </center>
   </p>
   <p>
-    Я, {{$client->Наименование}}, дата рождения {{dateFormat($client->ДатаРождения)}}г., место рождения
-    {{$client->МестоРождения}}.
-    {{$client->passport->toString()}} проживающий(-ая) по адресу: {{$client->address->toString()}}
-    {{$client->address->toString()}},
-    поставлен(-а) на учет в качестве налогоплательщика в {{$client->taxInspection->Наименование}}, мне присвоен ИНН
-    {{$client->ИНН}}.
+    Я, {!!$client->printValue('Наименование')!!}, дата рождения {!!$client->printValue('ДатаРождения')!!}г., место рождения
+    {!!$client->printValue('МестоРождения')!!}. {!!$client->printValue('passport.string')!!} проживающий(-ая) по адресу: {!!$client->printValue('address.string')!!},
+    поставлен(-а) на учет в качестве налогоплательщика в
+    {!!$client->printValue('taxInspection.Наименование')!!}
+    , мне присвоен ИНН {!!$client->printValue('ИНН')!!}.
   </p>
   <p>
     В качестве индивидуального предпринимателя зарегистрирован(-а) не был, что подтверждает
-    {{$client->getAttachmentName('справка о наличии ИП')}}.
+    {!!$client->getAttachmentName('справка о наличии ИП')!!}.
   </p>
   <p>
     @if ($client->СемейноеПоложение)
@@ -93,7 +92,7 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
   <p>
     @switch($client->Занятость)
     @case('Работает')
-    Я работаю в {{$client->job->Наименование}}, в должности {{$client->Должность}} по адресу: {{$client->job->Адрес}}.
+    Я работаю в {!!$client->printValue('job.Наименование')!!}, в должности {!!$client->printValue('Должность')!!} по адресу: {!!$client->printValue('job.address.string')!!}.
     @break
     @case('Безработный')
     Я состою на учете в качестве ищущего работу, что подтверждает
@@ -103,8 +102,8 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
     Я являюсь пенсионером и не работаю.
     @break
     @case('Работающий пенсионер')
-    Я являюсь пенсионером и дополнительно работаю в {{$client->job->Наименование}}, в должности {{$client->Должность}}
-    по адресу: {{$client->job->Адрес}}.
+    Я являюсь пенсионером и дополнительно работаю в {!!$client->printValue('job.Наименование')!!}, в должности {!!$client->printValue('Должность')!!}
+    по адресу: {!!$client->printValue('job.address.string')!!}.
     @break
     @default
 
@@ -131,12 +130,12 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
     неспособностью удовлетворить требования кредиторов и уполномоченного органа в полном объеме.
   </p>
   <p>
-    Так, по состоянию на {{dateFormat($client->ДатаПодачиЗаявления)}}г. сумма требований кредиторов по денежным
+    Так, по состоянию на {!!$client->printValue('ДатаПодачиЗаявления')!!}г. сумма требований кредиторов по денежным
     обязательствам, которые мною не оспариваются,
     составляет {{ moneySpell($client->creditors->sum('СуммаВсего')) }}.
   </p>
   <p>
-    Задолженность по обязательным платежам на {{dateFormat($client->ДатаПодачиЗаявления)}}г.
+    Задолженность по обязательным платежам на {!!$client->printValue('ДатаПодачиЗаявления')!!}г.
     @if ($client->taxesTotal()>0)
     составляет {{moneySpell($client->taxesTotal())}}.
     @else
@@ -169,19 +168,20 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
     @elseif ($deal->ВидСделки==='Продажа')
     мною продан
     @endif
-    объект недвижимости, {{mb_strtolower($deal->dealable->Наименование, 'UTF-8')}} общей площадью {{$deal->dealable->Площадь}} кв.м.,
+    объект недвижимости, {{mb_strtolower($deal->dealable->Наименование, 'UTF-8')}} общей площадью
+    {{$deal->dealable->Площадь}} кв.м.,
     расположенный (-ая) по адресу:
     {{$deal->dealable->Адрес}} что подтверждает {{$deal->Основание}}.
     @endif
   </p>
-    @endforeach
-    @else
-    За три года до подачи заявления о признании банкротом я не совершал сделки с недвижимым имуществом, ценными
-    бумагами, долями в уставном капитале, транспортными средствами, а также сделки на сумму свыше трехсот тысяч рублей.
+  @endforeach
+  @else
+  За три года до подачи заявления о признании банкротом я не совершал сделки с недвижимым имуществом, ценными
+  бумагами, долями в уставном капитале, транспортными средствами, а также сделки на сумму свыше трехсот тысяч рублей.
   @endif
   </p>
   <p>
-    Мне известно, что по состоянию на {{dateFormat($client->ДатаПодачиЗаявления)}}г. в отношении меня
+    Мне известно, что по состоянию на {!!$client->printValue('ДатаПодачиЗаявления')!!}г. в отношении меня
     @if ($client->executiveDocuments->count()>0)
     находятся на исполнении следующие исполнительные документы:
     @foreach ($client->executiveDocuments as $doc)
@@ -194,7 +194,7 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
   @endif
   </p>
   <p>
-    По состоянию на {{dateFormat($client->ДатаПодачиЗаявления)}}г. сумма задолженности перед кредиторами составляет
+    По состоянию на {!!$client->printValue('ДатаПодачиЗаявления')!!}г. сумма задолженности перед кредиторами составляет
     {{ moneySpell($client->creditors->sum('СуммаВсего')) }},
     @if ($client->creditors->sum('СуммаВсего')>500000)
     что превышает 500 000 рублей, и срок, в течение которого не были исполнены требования, превышает три месяца с
@@ -283,8 +283,8 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
   </p>
   <p>
     Прошу утвердить финансового управляющего из числа членов Ассоциации арбитражных управляющих
-    {{$client->sro->Наименование}}, ОГРН
-    {{$client->sro->ОГРН}}, ИНН {{$client->sro->ИНН}}, ({{$client->sro->Адрес}}).
+    {!!$client->printValue('sro.Наименование')!!}, ОГРН
+    {!!$client->printValue('sro.ОГРН')!!}, ИНН {!!$client->printValue('sro.ИНН')!!}, ({!!$client->printValue('sro.address.string')!!}).
   </p>
   <p>
     Денежные средства на выплату вознаграждения финансовому управляющему в сумме 25000,00 (Двадцать пять тысяч) рублей
@@ -309,8 +309,9 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
   </p>
   <p>
     3. Утвердить кандидатуру финансового управляющего из числа саморегулируемой организации – Ассоциация арбитражных
-    управляющих {{$client->sro->Наименование}}, ОГРН {{$client->sro->ОГРН}}, ИНН {{$client->sro->ИНН}},
-    ({{$client->sro->Адрес}}).
+    управляющих
+    {!!$client->printValue('sro.Наименование')!!}, ОГРН
+    {!!$client->printValue('sro.ОГРН')!!}, ИНН {!!$client->printValue('sro.ИНН')!!}, ({!!$client->printValue('sro.address.string')!!}).
   </p>
 
   <h5>

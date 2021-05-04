@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addTab, addRow, changeFolder, deleteRow, loadData } from '../../redux/actions/actions';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, TextField, Dialog, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemIcon, ListItemText, Collapse } from '@material-ui/core';
-import { AddCircle as AddCircleIcon, CreateNewFolder as NewFolderIcon, Folder as FolderIcon, ArrowRight as ArrowRightIcon, ArrowForward as ArrowForwardIcon, Delete as DeleteIcon } from '@material-ui/icons';
+import { AddCircle as AddCircleIcon, CreateNewFolder as NewFolderIcon, Folder as FolderIcon, ArrowRight as ArrowRightIcon, ArrowForward as ArrowForwardIcon, Delete as DeleteIcon, Refresh } from '@material-ui/icons';
 import { TabContext } from '../context';
 import DialogWrapper from './DialogWrapper';
 import ExtendableButton from './ExtendableButton';
@@ -400,6 +400,10 @@ const IndexTable = () => {
     dispatch(deleteRow(tabId, api, ids));
   }
 
+  const handleRefetch = () => {
+    refetch();
+  }
+
   return (
     <>
       <div className={classes.buttonGroup}>
@@ -416,6 +420,13 @@ const IndexTable = () => {
           icon={<DeleteIcon color="primary" />}
           buttonLabel="Удалить" />
         <MoveToFolderDialog rowIds={activeRowsIds} api={api} />
+        <ExtendableButton
+          variant="contained"
+          startIcon={<Refresh color="primary" />}
+          onClick={handleRefetch}
+        >
+          <Typography variant="body2">Обновить</Typography>
+        </ExtendableButton>
       </div>
       <TableContainer className={classes.container}>
         <Table
@@ -437,37 +448,36 @@ const IndexTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {
-              !data
-                ?
-                <tr>
-                  <td colSpan={columns.length}>
-                    <LinearProgress />
-                  </td>
-                </tr>
-                :
-                data.map(row => {
-                  if (row.parent_id !== null) return;
-                  return (
-                    <Fragment key={row.id}>
-                      {row.isGroup
-                        ?
-                        <FolderRow
-                          row={row}
-                          activeRowsIds={activeRowsIds}
-                          setActive={handleActiveRow}
-                          level={0} />
-                        :
-                        <Row
-                          row={row}
-                          activeRowsIds={activeRowsIds}
-                          setActive={handleActiveRow}
-                          level={0} />
-                      }
-                    </Fragment>
-                  )
-                }
+            {loading &&
+              <tr>
+                <td colSpan={columns.length}>
+                  <LinearProgress />
+                </td>
+              </tr>
+            }
+            {data &&
+              data.map(row => {
+                if (row.parent_id !== null) return;
+                return (
+                  <Fragment key={row.id}>
+                    {row.isGroup
+                      ?
+                      <FolderRow
+                        row={row}
+                        activeRowsIds={activeRowsIds}
+                        setActive={handleActiveRow}
+                        level={0} />
+                      :
+                      <Row
+                        row={row}
+                        activeRowsIds={activeRowsIds}
+                        setActive={handleActiveRow}
+                        level={0} />
+                    }
+                  </Fragment>
                 )
+              }
+              )
             }
           </TableBody>
         </Table>

@@ -1,4 +1,4 @@
-import { ADD_TAB, CLOSE_TAB, SET_ACTIVE_TAB, CHANGE_DATA, CHANGE_FOLDER, DELETE_ROW, ADD_ROW, CHANGE_COLLECTION_DATA, ADD_COLLECTION_ROW, DELETE_COLLECTION_ROW, REORDER_TABLE, SET_ACTIVE_ROW, INSERT_COLLECTION_ROW, REFETCH_TAB, SET_DRAWER_OPEN, LOAD_DATA } from './../actions/ActionTypes';
+import { ADD_TAB, CLOSE_TAB, SET_ACTIVE_TAB, CHANGE_DATA, CHANGE_FOLDER, DELETE_ROW, ADD_ROW, CHANGE_COLLECTION_DATA, ADD_COLLECTION_ROW, DELETE_COLLECTION_ROW, REORDER_TABLE, SET_ACTIVE_ROW, INSERT_COLLECTION_ROW, REFETCH_TAB, SET_DRAWER_OPEN, LOAD_DATA, CHANGE_INDEX_DATA } from './../actions/ActionTypes';
 
 const initialState = {
   activeTab: -1,
@@ -56,6 +56,10 @@ export const appReducer = (state = initialState, action) => {
     case CHANGE_DATA:
       tabs[tabIndex].data[action.key] = action.value;
       return { ...state, tabs };
+    case CHANGE_INDEX_DATA:
+      const index = tabs[tabIndex].data.findIndex(el => el.id === action.id && el.ВидДокумента === action.docType);
+      tabs[tabIndex].data[index][action.key] = action.value;
+      return { ...state, tabs };
     case CHANGE_COLLECTION_DATA:
       tabs[tabIndex].data[action.collection][action.index][action.key] = action.value;
       return { ...state, tabs };
@@ -76,7 +80,6 @@ export const appReducer = (state = initialState, action) => {
       });
       return { ...state, tabs };
     case DELETE_ROW:
-      //tabs = tabs.map(tab => tab.id === action.tabId ? tab.data.filter(row => !action.row_ids.includes(row.id)) : tab);
       tabs[tabIndex].data = tabs[tabIndex].data.filter(row => !action.row_ids.includes(row.id));
       return { ...state, tabs };
     case ADD_ROW:

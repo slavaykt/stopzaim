@@ -253,8 +253,13 @@ class ImportController extends Controller
       $client->save();
     }
 
+    Contract::query()->delete();
+    $counter = 0;
     foreach ($content['Договора'] as $cnt) {
-      $contract = Contract::updateOrCreate(['Дата' => $cnt['Дата'], 'Номер' => $cnt['Номер']], array_only($cnt, ['Дата', 'Номер', 'Сумма']));
+      $counter += 1;
+      // $contract = Contract::updateOrCreate(['Дата' => $cnt['Дата'], 'Номер' => $cnt['Номер']], array_only($cnt, ['Дата', 'Номер', 'Сумма']));
+      $contract = Contract::create(array_only($cnt, ['Дата', 'Сумма']));
+      $contract->Номер = $counter;
       $client = Client::where('Наименование', $cnt['Клиент'])->first();
       $contract->client()->associate($client);
       foreach ($cnt['График'] as $payment) {

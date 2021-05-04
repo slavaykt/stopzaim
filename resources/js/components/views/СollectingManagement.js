@@ -59,13 +59,13 @@ function ListItem_({ item, handleCheck, showChecked }) {
             :
             el.Тип;
           return (
-            <Transition in={showChecked ? true : !el.Наличие} timeout={duration}>
+            <Transition key={i} in={showChecked ? true : !el.Наличие} timeout={duration}>
               {(state) => (
                 <div style={{
                   ...defaultStyle,
                   ...transitionStyles[state]
                 }}>
-                  <ListItem key={i} divider className={!!el.Наличие ? classes.checked : classes.nested}>
+                  <ListItem divider className={!!el.Наличие ? classes.checked : classes.nested}>
                     <ListItemIcon>
                       <Checkbox
                         edge="start"
@@ -99,6 +99,7 @@ function СollectingManagement() {
 
   useEffect(() => {
     if (fetchedData) {
+
       const groupedData = fetchedData.reduce((result, item) => {
         let newResult = [...result];
         let clientIndex = result.findIndex(el => el.Клиент === item.Клиент.Наименование);
@@ -115,8 +116,6 @@ function СollectingManagement() {
       }));
     }
   }, [fetchedData])
-
-  console.log(data);
 
   const handleCheck = (client, id) => {
     const newData = data.map(item =>

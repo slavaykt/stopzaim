@@ -40,9 +40,13 @@ class CashExpenseOrderController extends Controller
       }
     }
 
-    public function edit(CashExpenseOrder $cashExpenseOrder)
+    public function edit(Request $request, CashExpenseOrder $cashExpenseOrder)
     {
-        //
+      try {
+        return response()->json(new CashExpenseOrderResource($cashExpenseOrder), 200);
+      } catch (\Throwable $th) {
+        return response($th->getMessage(), 200);
+      }
     }
 
     public function update(CashExpenseOrderRequest $request, CashExpenseOrder $cashExpenseOrder)

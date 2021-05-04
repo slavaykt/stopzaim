@@ -15,14 +15,14 @@ class CollectingManagementController extends Controller
     $response = array_merge(
       CollectingManagementResource::collection(
         ClientCreditor::whereHas('client', function ($query) {
-          $query->where('ДатаПодачиЗаявления', '=', '0001-01-01');
+          $query->where('Этап', '=', 'подготовка документов');
         })->get()
       )->toArray(null),
       CollectingManagementResource::collection(
         ClientAttachment::whereHas('section', function ($query) {
           $query->where('КонтролироватьСбор', '=', 1);
         })->whereHas('client', function ($query) {
-          $query->where('ДатаПодачиЗаявления', '=', '0001-01-01');
+          $query->where('Этап', '=', 'подготовка документов');
         })->get()
       )->toArray(null),
     );

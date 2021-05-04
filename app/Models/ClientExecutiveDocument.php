@@ -15,7 +15,7 @@ class ClientExecutiveDocument extends Model
       'id' => null,
       'client_id' => null,
       'ВидДокумента' => '',
-      'Дата' => '',
+      'Дата' => null,
       'Номер' => '',
       'Исполнитель' => '',
       'Содержание' => '',

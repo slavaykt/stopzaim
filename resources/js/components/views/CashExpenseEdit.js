@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { changeCollectionData, changeData, handleRegister, setLayout } from '../../redux/actions/actions';
 import { TabContext } from '../context';
 import axios from 'axios';
+import { useRegisterHandler } from '../../hooks/register.handlers.hook';
 
 
 const CashExpenseEdit = () => {
@@ -15,6 +16,7 @@ const CashExpenseEdit = () => {
   const { data, sourceTabId } = useSelector(state => state.app.getTab(tabId));
   const enumerations = useSelector(state => state.config.enumerations);
   const baseApi = '/api/cash/orders/expense';
+  const { cashExpenseRegisterHandler, cashExpenseUnregisterHandler } = useRegisterHandler();
   const [layout, setLayout] = useState(
     [
       {
@@ -85,48 +87,6 @@ const CashExpenseEdit = () => {
     ]
   );
 
-  const registerHandler = async () => {
-    const payload = {
-      method: 'updateOrCreate',
-      registerable_type: "App\\Models\\CashExpenseOrder",
-      registerable_id: data.id,
-      startDate: data.Дата,
-      data: [
-        {
-          Дата: data.Дата,
-          СуммаРасход: data.Сумма,
-          registerable_type: "App\\Models\\CashExpenseOrder",
-          registerable_id: data.id,
-        }
-      ]
-    };
-    const res = await axios.post('api/cash_register', payload);
-    if (res.status === 201) {
-      await dispatch(handleRegister(tabId, baseApi, data, 1));
-    }
-  }
-
-  const unRegisterHandler = async () => {
-    const payload = {
-      method: 'delete',
-      registerable_type: "App\\Models\\CashExpenseOrder",
-      registerable_id: data.id,
-      startDate: data.Дата,
-      data: [
-        {
-          Дата: data.Дата,
-          СуммаРасход: data.Сумма,
-          registerable_type: "App\\Models\\CashExpenseOrder",
-          registerable_id: data.id,
-        }
-      ]
-    };
-    const res = await axios.post('api/cash_register', payload);
-    if (res.status === 201) {
-      await dispatch(handleRegister(tabId, baseApi, data, 0));
-    }
-  }
-
   const printOptions = [];
 
   return (
@@ -134,8 +94,8 @@ const CashExpenseEdit = () => {
       <EditForm
         layout={layout}
         printOptions={printOptions}
-        registerHandler={registerHandler}
-        unRegisterHandler={unRegisterHandler}
+        registerHandler={cashExpenseRegisterHandler}
+        unRegisterHandler={cashExpenseUnregisterHandler}
         api={baseApi} />
     </TabContext.Provider>
   )

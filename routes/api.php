@@ -69,6 +69,7 @@ Route::get('config', function () {
     'cashIncomeTypes' => Config::get('enumerations.cash.income.types'),
     'cashExpenseTypes' => Config::get('enumerations.cash.expense.types'),
     'defaultAttachmentSections' => Config::get('enumerations.attachment.sections'),
+    'stages' => Config::get('enumerations.stages'),
   ];
   return response()->json($config, 200);
 });

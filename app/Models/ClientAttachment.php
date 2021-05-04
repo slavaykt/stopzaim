@@ -34,13 +34,4 @@ class ClientAttachment extends Model
     return $this->belongsTo(ClientAttachmentSection::class, 'Раздел');
   }
 
-  // public function scopeSelectingControlled($query)
-  // {
-  //   //   $users = $query::whereHas('Раздел', function($q) {
-  //   //     $q->where('КонтролироватьСбор', '=', 1);
-  //   // })->get();
-  //   return $query::whereHas('Раздел', function ($q) {
-  //     $q->where('КонтролироватьСбор', '=', 1);
-  //   });
-  // }
 }

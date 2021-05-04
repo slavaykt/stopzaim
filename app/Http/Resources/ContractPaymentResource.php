@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ContractPaymentResource extends JsonResource
@@ -14,6 +15,10 @@ class ContractPaymentResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+      return [
+        'id' => $this->id,
+        'Дата' => $this->Дата,
+        'Сумма' => $this->Сумма,
+      ];
     }
 }

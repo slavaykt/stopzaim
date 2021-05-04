@@ -22,7 +22,7 @@ class Client extends General
     'Фамилия' => '',
     'Имя' => '',
     'Отчество' => '',
-    'ДатаРождения' => '0001-01-01',
+    'ДатаРождения' => null,
     'Телефон' => '',
     'ИНН' => '',
     'СНИЛС' => '',
@@ -35,10 +35,11 @@ class Client extends General
     'Госуслуги' => '',
     'СРО' => null,
     'АрбитражныйСуд' => null,
-    'ДатаПодачиЗаявления' => '0001-01-01',
+    'ДатаПодачиЗаявления' => null,
     'Комментарий' => '',
     'СемейноеПоложение' => 0,
     'Супруг' => "",
+    'Этап' => "",
   ];
 
   public $collections = [
@@ -138,7 +139,7 @@ class Client extends General
     if ($attachment) {
       return $attachment->Наименование;
     } else {
-      return '<span class="error">Приложение не найдено<span>';
+      return "<span class='error'>$sectionName отсутствует</span>";
     }
   }
 

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addCollectionRow, changeCollectionData, changeData, deleteCollectionRow, insertCollectionRow } from '../../redux/actions/actions';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
@@ -24,7 +24,7 @@ import ContentEditable from './ContentEditable';
 import SelectTable from './SelectTable';
 import { useWindowSize } from '../../hooks/window.size.hook';
 import axios from 'axios';
-
+import ExtendableButton from './ExtendableButton';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,24 +63,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CustomButton = withStyles((theme) => ({
-  root: {
-    paddingRight: 8,
-    '& p': {
-      transition: theme.transitions.create(["display"], {
-        duration: theme.transitions.duration.complex,
-      }),
-      display: 'none'
-    },
-    '&:hover p': {
-      display: 'inline'
-    },
-    '&:focus ': {
-      outline: 'none'
-    },
-  },
-}))(Button);
-
 const EditCollectionTable = ({ columns, collection }) => {
 
   const dispatch = useDispatch();
@@ -91,6 +73,11 @@ const EditCollectionTable = ({ columns, collection }) => {
   const schema = useSelector(state => state.app.getTab(tabId).data.schema[collection]);
   const { collectionTableSize } = useWindowSize();
   const classes = useStyles({ collectionTableSize });
+  const bottomRef = useRef(null);
+
+  useEffect(()=>{
+    scrollToBottom();
+  });
 
   const handleChange = (rowIndex, onChangeHandler, isRelationship = false) => (e) => {
     const payload = isRelationship
@@ -98,16 +85,22 @@ const EditCollectionTable = ({ columns, collection }) => {
       : e.target.type === 'number'
         ? Number(e.target.value)
         : e.target.value;
-    console.log(e.target.value);
     dispatch(changeCollectionData(tabId, collection, rowIndex, e.target.name, payload));
     if (onChangeHandler) {
       onChangeHandler(allData, rowIndex, e.target.value);
     }
   }
 
+  const scrollToBottom = () => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth", block: 'center' });
+    }
+  }
+
   const handleAddRow = () => {
     dispatch(addCollectionRow(tabId, collection, { ...schema }));
     setActiveRow(data.length - 1);
+    // scrollToBottom();
   }
 
   const handleDeleteRow = () => {
@@ -158,7 +151,7 @@ const EditCollectionTable = ({ columns, collection }) => {
     }
   }
 
-  const renderTableRow = (row, rowIndex) => {
+  const renderTableRow = (row, rowIndex, isLastRow) => {
     if (row.delete) return false;
     return (
       <TableRow
@@ -191,7 +184,7 @@ const EditCollectionTable = ({ columns, collection }) => {
                     onChange={handleChange(rowIndex, column.onChangeHandler)}
                   >
                     {
-                      column.getOptions().map((option, i) =>
+                      column.getOptions(allData).map((option, i) =>
                         <MenuItem
                           key={i}
                           value={option.value}>
@@ -230,35 +223,35 @@ const EditCollectionTable = ({ columns, collection }) => {
     <>
       <Grid item xs={12}>
         <div className={classes.buttonGroup}>
-          <CustomButton
+          <ExtendableButton
             variant="contained"
             startIcon={<AddCircleIcon color="primary" />}
             onClick={handleAddRow}
           >
             <Typography variant="body2">Добавить строку</Typography>
-          </CustomButton>
-          <CustomButton
+          </ExtendableButton>
+          <ExtendableButton
             variant="contained"
             startIcon={<DeleteIcon color="primary" />}
             onClick={handleDeleteRow}
           >
             <Typography variant="body2">Удалить строку</Typography>
-          </CustomButton>
-          <CustomButton
+          </ExtendableButton>
+          <ExtendableButton
             variant="contained"
             startIcon={<FileCopyIcon color="primary" />}
             onClick={handleCopy}
           >
             <Typography variant="body2">Скопировать строку</Typography>
-          </CustomButton>
+          </ExtendableButton>
           {collection === 'Приложения' &&
-            <CustomButton
+            <ExtendableButton
               variant="contained"
               startIcon={<FormatListBulletedIcon color="primary" />}
               onClick={handleDefault}
             >
               <Typography variant="body2">Заполнить по умолчанию</Typography>
-            </CustomButton>
+            </ExtendableButton>
           }
         </div>
       </Grid>
@@ -283,9 +276,10 @@ const EditCollectionTable = ({ columns, collection }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.map((row, rowIndex) => renderTableRow(row, rowIndex))}
+              {data.map((row, rowIndex) => renderTableRow(row, rowIndex, rowIndex === data.length - 1))}
             </TableBody>
           </Table>
+          <div ref={bottomRef} />
         </TableContainer>
       </Grid>
     </>

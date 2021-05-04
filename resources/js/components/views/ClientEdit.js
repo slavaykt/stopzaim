@@ -75,7 +75,7 @@ const ClientEdit = () => {
                   },
                 },
                 {
-                  type: 'input',
+                  type: 'date',
                   label: 'Дата рождения',
                   key: 'ДатаРождения',
                   size: 4,
@@ -176,15 +176,24 @@ const ClientEdit = () => {
                   type: 'input',
                   label: 'Госуслуги',
                   key: 'Госуслуги',
-                  size: 6,
+                  size: 4,
                   inputType: 'text'
                 },
                 {
-                  type: 'input',
+                  type: 'date',
                   label: 'Дата подачи заявления',
                   key: 'ДатаПодачиЗаявления',
-                  size: 6,
+                  size: 4,
                   inputType: 'date'
+                },
+                {
+                  type: 'select',
+                  label: 'Этап',
+                  key: 'Этап',
+                  size: 4,
+                  getOptions: () => {
+                    return enumerations.stages;
+                  },
                 },
                 {
                   type: 'input',
@@ -602,7 +611,7 @@ const ClientEdit = () => {
                       key: 'Имущество',
                       type: 'select',
                       width: '300px',
-                      getOptions: () => {
+                      getOptions: (data) => {
                         const realty = data.НедвижимоеИмущество.map(item =>
                           ({ view: item.Наименование, value: `dealable_type:App\\Models\\ClientRealty|dealable_id:${item.id}` })
                         );
@@ -657,9 +666,9 @@ const ClientEdit = () => {
                           ({ view: item.Наименование, value: item.id })
                         )
                       },
-                      onChangeHandler: (rowIndex, sectionId) => {
+                      onChangeHandler: (data, rowIndex, sectionId) => {
                         const val = attachmentSection.data.find(el => el.id === sectionId);
-                        dispatch(changeCollectionData(tabIndex, 'Приложения', rowIndex, 'Наименование', val.ТекстПриложения));
+                        dispatch(changeCollectionData(tabId, 'Приложения', rowIndex, 'Наименование', val.ТекстПриложения));
                       }
                     },
                     {

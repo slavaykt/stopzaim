@@ -1,5 +1,5 @@
 import Axios from 'axios';
-import { ADD_COLLECTION_ROW, ADD_TAB, CLOSE_TAB, ADD_ROW, CHANGE_COLLECTION_DATA, CHANGE_DATA, CHANGE_FOLDER, DELETE_COLLECTION_ROW, DELETE_ROW, INSERT_COLLECTION_ROW, LOAD_CONFIG, REORDER_TABLE, SET_ACTIVE_ROW, SET_ACTIVE_TAB, REFETCH_TAB, SET_DRAWER_OPEN, LOAD_DATA } from './ActionTypes';
+import { ADD_COLLECTION_ROW, ADD_TAB, CLOSE_TAB, ADD_ROW, CHANGE_COLLECTION_DATA, CHANGE_DATA, CHANGE_FOLDER, DELETE_COLLECTION_ROW, DELETE_ROW, INSERT_COLLECTION_ROW, LOAD_CONFIG, REORDER_TABLE, SET_ACTIVE_ROW, SET_ACTIVE_TAB, REFETCH_TAB, SET_DRAWER_OPEN, LOAD_DATA, CHANGE_INDEX_DATA } from './ActionTypes';
 import { v4 as uuidv4 } from 'uuid';
 
 export const addTab = (label, api, componentName, sourceTabId) => {
@@ -10,20 +10,6 @@ export const addTab = (label, api, componentName, sourceTabId) => {
       tab: { id, label, componentName, api, sourceTabId }
     }
   )
-  // return async dispatch => {
-  //   let data = [];
-  //   if (api) {
-  //     const response = await Axios.get(api);
-  //     data = await response.data;
-  //   }
-  //   const id = uuidv4();
-  //   dispatch(
-  //     {
-  //       type: ADD_TAB,
-  //       tab: { id, label, componentName, data, api, sourceTabId }
-  //     }
-  //   )
-  // }
 }
 
 export const loadData = (tabId, data) => {
@@ -78,11 +64,11 @@ export const setActiveTab = (tabId) => {
   )
 }
 
-export const setActiveRow = (tabId, rowIndex,clear) => {
+export const setActiveRow = (tabId, rowIndex, clear) => {
   return (
     {
       type: SET_ACTIVE_ROW,
-      tabId, rowIndex,clear
+      tabId, rowIndex, clear
     }
   )
 }
@@ -148,6 +134,7 @@ export const changeFolder = (tabId, api, row_ids, parent_id) => {
 
 export const deleteRow = (tabId, api, tabApi, row_ids) => {
   return async dispatch => {
+    console.log(api + '/' + row_ids.join());
     const response = await Axios.delete(api + '/' + row_ids.join());
     if (response.status === 204) {
       dispatch(
@@ -176,7 +163,7 @@ export const addRow = (tabId, api, row) => {
       dispatch(
         {
           type: ADD_ROW,
-          tabId, 
+          tabId,
           row: { ...row, id: response.data.id }
         }
       );
@@ -221,18 +208,32 @@ export const loadConfig = () => {
   }
 }
 
-export const handleRegister = (tabId, api, data, registered) => {
+export const handleRegister = (tabId, api, data, tabType, registered) => {
   return async dispatch => {
     const response = data.id ? await Axios.put(api + '/' + String(data.id), { ...data, registered: registered }) : await Axios.post(api, { ...data, registered: registered });
     if (response.status === 200 || response.status === 201) {
-      dispatch(
-        {
-          type: CHANGE_DATA,
-          tabId,
-          key: 'registered',
-          value: registered
-        }
-      )
+      if (tabType === 'edit') {
+        dispatch(
+          {
+            type: CHANGE_DATA,
+            tabId,
+            key: 'registered',
+            value: registered
+          }
+        )
+      } else if (tabType === 'index') {
+
+        dispatch(
+          {
+            type: CHANGE_INDEX_DATA,
+            tabId,
+            id: data.id,
+            docType: data.ВидДокумента,
+            key: 'registered',
+            value: registered
+          }
+        )
+      }
     }
   }
 }

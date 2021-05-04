@@ -19,7 +19,7 @@ class ClientBankAccount extends Model
     'НомерСчета' => '',
     'Банк' => null,
     'Остаток' => 0,
-    'ДатаОткрытия' => '',
+    'ДатаОткрытия' => null,
   ];
 
   public static function create(array $attr = array())

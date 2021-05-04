@@ -6,7 +6,7 @@ import views from '../views/views';
 import { TextField, Grid, InputLabel, FormControl, Typography, Select, Tabs, MenuItem, FormControlLabel, Checkbox, Tab, Snackbar } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
-import { Save as SaveIcon, ExitToApp as ExitToAppIcon, Cancel as CancelIcon, CheckCircle as CheckCircleIcon, Delete as DeleteIcon, Print as PrintIcon, RssFeedRounded } from '@material-ui/icons';
+import { Save as SaveIcon, ExitToApp as ExitToAppIcon, Cancel as CancelIcon, CheckCircle as CheckCircleIcon, Delete as DeleteIcon, Print as PrintIcon, RssFeedRounded, Refresh } from '@material-ui/icons';
 import { TabContext } from '../context';
 import EditCollectionTable from './EditCollectionTable';
 import SelectTable from './SelectTable';
@@ -117,6 +117,23 @@ function EditForm({ layout, api, registerHandler, unRegisterHandler, printOption
             fullWidth
             value={data[node.key] || ''}
             onChange={handleChange(node.onChangeHandler)}
+            className={classes.textField}
+          />
+        }
+        {
+          node.type === 'date' &&
+          <TextField
+            label={node.label}
+            margin="dense"
+            name={node.key}
+            type={node.inputType}
+            size="small"
+            fullWidth
+            value={data[node.key] || ''}
+            onChange={handleChange(node.onChangeHandler)}
+            InputLabelProps={
+              { shrink: true }
+            }
             className={classes.textField}
           />
         }
@@ -232,7 +249,7 @@ function EditForm({ layout, api, registerHandler, unRegisterHandler, printOption
           }
         }
         if (register) {
-          await registerHandler();
+          await registerHandler(tabId, data, 'edit');
         }
         dispatch(refetchTab(sourceTab));
       }
@@ -249,7 +266,7 @@ function EditForm({ layout, api, registerHandler, unRegisterHandler, printOption
   }
 
   const handleUnRegister = async () => {
-    await unRegisterHandler();
+    await unRegisterHandler(tabId, data, 'edit');
     dispatch(refetchTab(sourceTab));
   }
 
@@ -268,13 +285,18 @@ function EditForm({ layout, api, registerHandler, unRegisterHandler, printOption
     setError('');
   };
 
-  if (!data) {
-    return (
-      <Grid item xs={12}>
-        <LinearProgress />
-      </Grid>
-    )
+  const handleRefetch = () => {
+    refetch();
   }
+
+
+  // if (loading || !data) {
+  //   return (
+  //     <Grid item xs={12}>
+  //       <LinearProgress />
+  //     </Grid>
+  //   )
+  // }
 
   return (
     <form >
@@ -295,7 +317,7 @@ function EditForm({ layout, api, registerHandler, unRegisterHandler, printOption
             <Typography variant="body2">Провести</Typography>
           </ExtendableButton>
         }
-        {unRegisterHandler &&
+        {(unRegisterHandler && data) &&
           <ExtendableButton
             variant="contained"
             startIcon={<CancelIcon color={data.registered ? 'primary' : 'disabled'} />}
@@ -327,13 +349,20 @@ function EditForm({ layout, api, registerHandler, unRegisterHandler, printOption
         >
           <Typography variant="body2">Закрыть</Typography>
         </ExtendableButton>
+        <ExtendableButton
+          variant="contained"
+          startIcon={<Refresh color="primary" />}
+          onClick={handleRefetch}
+        >
+          <Typography variant="body2">Обновить</Typography>
+        </ExtendableButton>
       </div>
       <Grid container spacing={1}>
-        {saving &&
+        {(saving || loading) &&
           <Grid item xs={12}>
             <LinearProgress />
           </Grid>}
-        {layout.map((node, nodeIndex) => renderNode(node, nodeIndex))}
+        {data && layout.map((node, nodeIndex) => renderNode(node, nodeIndex))}
       </Grid>
       <Snackbar open={!!error} autoHideDuration={6000} onClose={handleClearError}>
         <Alert onClose={handleClearError} severity="error">

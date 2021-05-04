@@ -12,7 +12,7 @@ class CashIncomeOrderController extends Controller
 {
   public function index()
   {
-    return response(CashIncomeOrderResource::collection(CashIncomeOrder::orderBy('Дата','asc')->get()), 200);
+    return response(CashIncomeOrderResource::collection(CashIncomeOrder::orderBy('Дата', 'asc')->get()), 200);
   }
 
   public function create()
@@ -40,9 +40,13 @@ class CashIncomeOrderController extends Controller
     }
   }
 
-   public function edit(CashIncomeOrder $cashIncomeOrder)
+  public function edit(Request $request, CashIncomeOrder $cashIncomeOrder)
   {
-    //
+    try {
+      return response()->json(new CashIncomeOrderResource($cashIncomeOrder), 200);
+    } catch (\Throwable $th) {
+      return response($th->getMessage(), 200);
+    }
   }
 
   public function update(CashIncomeOrderRequest $request, CashIncomeOrder $cashIncomeOrder)

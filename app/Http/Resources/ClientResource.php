@@ -46,6 +46,7 @@ class ClientResource extends JsonResource
       'ДатаПодачиЗаявления' => $this->ДатаПодачиЗаявления,
       'СемейноеПоложение' => $this->СемейноеПоложение,
       'Супруг' => $this->Супруг,
+      'Этап' => $this->Этап,
       'Комментарий' => $this->Комментарий,
       'Дети' => ClientChildResource::collection($this->children),
       'БанковскиеСчета' => ClientBankAccountResource::collection($this->bankAccounts),

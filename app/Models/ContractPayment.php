@@ -15,7 +15,7 @@ class ContractPayment extends Model
 
     protected $attributes = [
       'id' => null,
-      'Дата' => '',
+      'Дата' => "",
       'Сумма' => 0,
     ];
 
