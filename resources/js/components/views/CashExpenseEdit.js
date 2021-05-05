@@ -16,7 +16,7 @@ const CashExpenseEdit = () => {
   const { data, sourceTabId } = useSelector(state => state.app.getTab(tabId));
   const enumerations = useSelector(state => state.config.enumerations);
   const baseApi = '/api/cash/orders/expense';
-  const { cashExpenseRegisterHandler, cashExpenseUnregisterHandler } = useRegisterHandler();
+  const { cashExpenseRegisterHandler } = useRegisterHandler();
   const [layout, setLayout] = useState(
     [
       {
@@ -95,7 +95,6 @@ const CashExpenseEdit = () => {
         layout={layout}
         printOptions={printOptions}
         registerHandler={cashExpenseRegisterHandler}
-        unRegisterHandler={cashExpenseUnregisterHandler}
         api={baseApi} />
     </TabContext.Provider>
   )

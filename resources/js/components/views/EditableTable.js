@@ -14,13 +14,15 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import ContentEditable from './ContentEditable';
 import useAxios from 'axios-hooks';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import ExtendableButton from './ExtendableButton';
+import ConfirmableButton from './ConfirmableButton';
+import { AddCircle } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -39,24 +41,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CustomButton = withStyles((theme) => ({
-  root: {
-    paddingRight: 8,
-    '& p': {
-      transition: theme.transitions.create(["display"], {
-        duration: theme.transitions.duration.complex,
-      }),
-      display: 'none'
-    },
-    '&:hover p': {
-      display: 'inline'
-    },
-    '&:focus ': {
-      outline: 'none'
-    },
-  },
-}))(Button);
-
 const EditableTable = ({ columns }) => {
 
   const dispatch = useDispatch();
@@ -64,6 +48,7 @@ const EditableTable = ({ columns }) => {
   const { data: dataObject, api } = useSelector(state => state.app.getTab(tabId));
   const data = dataObject && dataObject.data;
   const def = dataObject && dataObject.default;
+  const schema = dataObject && dataObject.schema;
   const [activeRow, setActiveRow] = useState(null);
   const classes = useStyles();
   const tblRef = useRef(null);
@@ -72,12 +57,19 @@ const EditableTable = ({ columns }) => {
   const [{ data: fetchedData, loading, error }, refetch] = useAxios(api, { useCache: false });
   const [saving, setSaving] = useState(false);
 
+  console.log(dataObject);
+
   useEffect(() => {
     if (fetchedData) {
-      dispatch(loadData(tabId, { data: fetchedData.data.sort((prev, next) => prev.Порядок - next.Порядок), default: fetchedData.default }));
+      dispatch(loadData(tabId, { data: fetchedData.data.sort((prev, next) => prev.Порядок - next.Порядок), default: fetchedData.default, schema: fetchedData.schema }));
     }
   }, [fetchedData]);
 
+  const handleAddRow = () => {
+    const maxOrder = data.reduce((prev, el) => Math.max(prev, el.Порядок), 0);
+    dispatch(addCollectionRow(tabId, "data", { ...schema, Порядок: maxOrder + 1 }));
+    setActiveRow(data.length - 1);
+  }
 
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowUp') {
@@ -150,41 +142,43 @@ const EditableTable = ({ columns }) => {
     <>
       {saving && <LinearProgress />}
       <div className={classes.buttonGroup}>
-        <CustomButton
+        <ExtendableButton
+          variant="contained"
+          startIcon={<AddCircle color="primary" />}
+          onClick={handleAddRow}>
+          <Typography variant="body2">Добавить</Typography>
+        </ExtendableButton>
+        <ExtendableButton
           variant="contained"
           startIcon={<SaveIcon color="primary" />}
           onClick={handleSubmit}
         >
           <Typography variant="body2">Сохранить</Typography>
-        </CustomButton>
-        <CustomButton
-          variant="contained"
-          startIcon={<FormatListBulletedIcon color="primary" />}
-          onClick={handleDefault}
-        >
-          <Typography variant="body2">Заполнить по умолчанию</Typography>
-        </CustomButton>
-        <CustomButton
+        </ExtendableButton>
+        <ConfirmableButton
+          title="Все данные будут удалены. Продолжить?"
+          handler={handleDefault}
+          icon={<FormatListBulletedIcon color="primary" />}
+          buttonLabel="Заполнить по умолчанию" />
+        <ExtendableButton
           variant="contained"
           startIcon={<KeyboardArrowUpIcon color="primary" />}
           onClick={handleUp}
         >
           <Typography variant="body2">Передвинуть вверх</Typography>
-        </CustomButton>
-        <CustomButton
+        </ExtendableButton>
+        <ExtendableButton
           variant="contained"
           startIcon={<KeyboardArrowDownIcon color="primary" />}
           onClick={handleDown}
         >
           <Typography variant="body2">Передвинуть вниз</Typography>
-        </CustomButton>
-        <CustomButton
-          variant="contained"
-          startIcon={<DeleteIcon color="primary" />}
-          onClick={handleDeleteRow}
-        >
-          <Typography variant="body2">Удалить</Typography>
-        </CustomButton>
+        </ExtendableButton>
+        <ConfirmableButton
+          title="Вы уверены?"
+          handler={handleDeleteRow}
+          icon={<DeleteIcon color="primary" />}
+          buttonLabel="Удалить" />
       </div>
       <TableContainer ref={tblRef} className={classes.container}>
         <Table

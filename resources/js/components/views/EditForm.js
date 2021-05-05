@@ -53,7 +53,7 @@ const Alert = (props) => {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-function EditForm({ layout, api, registerHandler, unRegisterHandler, printOptions }) {
+function EditForm({ layout, api, registerHandler, printOptions, requiredForRegister }) {
 
   const dispatch = useDispatch();
   const { tabId, sourceTabId } = useContext(TabContext);
@@ -233,8 +233,7 @@ function EditForm({ layout, api, registerHandler, unRegisterHandler, printOption
     }
   }
 
-  const handleSubmit = (register) => async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (refetch) => {
     setSaving(true);
     const res = data.id ? await Axios.put(api + '/' + String(data.id), data) : await Axios.post(api, data);
     if (res.status === 200 || res.status === 201) {
@@ -248,26 +247,40 @@ function EditForm({ layout, api, registerHandler, unRegisterHandler, printOption
             dispatch(changeData(tabId, 'Номер', resData.Номер));
           }
         }
-        if (register) {
-          await registerHandler(tabId, data, 'edit');
+        if (refetch) {
+          dispatch(refetchTab(sourceTab));
+          handleRefetch();
         }
-        dispatch(refetchTab(sourceTab));
       }
       setSaving(false);
     }
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     dispatch(deleteRecord(tabId, api, data.id));
     dispatch(refetchTab(sourceTab));
-    if (unRegisterHandler) {
-      handleUnRegister();
-    }
   }
 
-  const handleUnRegister = async () => {
-    await unRegisterHandler(tabId, data, 'edit');
+  const handleRegister = async (isRegister) => {
+    if (isRegister) {
+      if (requiredForRegister) {
+        let errorText = '';
+        requiredForRegister.map(required=>{
+          if (!data[required]) {
+            errorText += `Не заполнено поле ${required} `
+          }
+        })
+        if (errorText) {
+          setError(errorText);
+          return
+        }
+      }
+      await handleSubmit(false)
+    }
+    const method = isRegister ? 'updateOrCreate' : 'delete';
+    await registerHandler(method, [data], 'edit');
     dispatch(refetchTab(sourceTab));
+    handleRefetch();
   }
 
   const handleCloseTab = () => {
@@ -289,22 +302,13 @@ function EditForm({ layout, api, registerHandler, unRegisterHandler, printOption
     refetch();
   }
 
-
-  // if (loading || !data) {
-  //   return (
-  //     <Grid item xs={12}>
-  //       <LinearProgress />
-  //     </Grid>
-  //   )
-  // }
-
   return (
     <form >
       <div className={classes.buttonGroup}>
         <ExtendableButton
           variant="contained"
           startIcon={<SaveIcon color="primary" />}
-          onClick={handleSubmit(false)}
+          onClick={()=>handleSubmit(true)}
         >
           <Typography variant="body2">Записать</Typography>
         </ExtendableButton>
@@ -312,17 +316,17 @@ function EditForm({ layout, api, registerHandler, unRegisterHandler, printOption
           <ExtendableButton
             variant="contained"
             startIcon={<CheckCircleIcon color="primary" />}
-            onClick={handleSubmit(true)}
+            onClick={() => handleRegister(1)}
           >
             <Typography variant="body2">Провести</Typography>
           </ExtendableButton>
         }
-        {(unRegisterHandler && data) &&
+        {(registerHandler && data) &&
           <ExtendableButton
             variant="contained"
             startIcon={<CancelIcon color={data.registered ? 'primary' : 'disabled'} />}
             disabled={!data.registered}
-            onClick={handleUnRegister}
+            onClick={() => handleRegister(0)}
           >
             <Typography variant="body2">Отменить проведение</Typography>
           </ExtendableButton>

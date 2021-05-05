@@ -29,7 +29,7 @@ const ContractIndex = () => {
   const { tabId } = tabContext;
   const { data, api: tabApi } = useSelector(state => state.app.getTab(tabId));
   const [{ data: fetchedData, loading, error }, refetch] = useAxios(tabApi, { useCache: false });
-  const { contractRegisterHandler, contractUnregisterHandler } = useRegisterHandler();
+  const { contractRegisterHandler } = useRegisterHandler();
   const classes = useStyles();
 
   useEffect(() => {
@@ -113,16 +113,15 @@ const ContractIndex = () => {
     dispatch(addTab('Новый ' + name, `${api}/${String(rowData.id)}/edit?copy=true`, component, tabId));
   }
 
-  const handleRegister = () => {
-    data.filter(el => el.isActive && !el.registered).map(rowData => {
-      contractRegisterHandler(tabId, rowData, 'index');
-    });
-  }
-
-  const handleUnRegister = () => {
-    data.filter(el => el.isActive && el.registered).map(rowData => {
-      contractUnregisterHandler(tabId, rowData, 'index');
-    });
+  const handleRegister = async (isRegister) => {
+    const method = isRegister ? 'updateOrCreate' : 'delete';
+    const dataToRegister = data.filter(el => el.isActive && el.registered !== isRegister);
+    if (dataToRegister.length) {
+      const status = await contractRegisterHandler(method, dataToRegister, 'index');
+      if (status === 201) {
+        handleRefetch();
+      }
+    }
   }
 
   const handleRefetch = () => {
@@ -158,14 +157,14 @@ const ContractIndex = () => {
         <ExtendableButton
           variant="contained"
           startIcon={<CheckCircle color="primary" />}
-          onClick={handleRegister}
+          onClick={()=>handleRegister(1)}
         >
           <Typography variant="body2">Провести</Typography>
         </ExtendableButton>
         <ExtendableButton
           variant="contained"
           startIcon={<Cancel color="primary" />}
-          onClick={handleUnRegister}
+          onClick={()=>handleRegister(0)}
         >
           <Typography variant="body2">Отменить проведение</Typography>
         </ExtendableButton>

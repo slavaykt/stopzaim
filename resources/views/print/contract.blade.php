@@ -657,8 +657,8 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
       <div class="col">
         <b>Заказчик</b>
         <br /> Гражданин РФ {{$contract->client->Наименование}}
-        <br /> {{$contract->client->passport->toString()}}
-        <br /> {{$contract->client->address->toString()}}
+        <br /> {{$contract->client->passport->string}}
+        <br /> {{$contract->client->address->string}}
         <br /> Электронная почта: _____________
         <br /> <i>С прейскурантом тарифов на оказание юридических услуг, действующих на момент заключения договора,
           ознакомлен (а) </i>

@@ -397,7 +397,7 @@ const IndexTable = () => {
 
   const handleDelete = () => {
     const ids = activeRowsIds.concat(data.filter(row => activeRowsIds.includes(row.parent_id)));
-    dispatch(deleteRow(tabId, api, ids));
+    dispatch(deleteRow(tabId, api, api, ids));
   }
 
   const handleRefetch = () => {

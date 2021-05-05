@@ -70,7 +70,7 @@ export const appReducer = (state = initialState, action) => {
       tabs[tabIndex].data[action.collection].splice(action.rowIndex, 0, action.row);
       return { ...state, tabs };
     case DELETE_COLLECTION_ROW:
-      tabs[tabIndex].data[action.collection].splice(action.rowIndex, 1);
+      tabs[tabIndex].data[action.collection][action.rowIndex].delete = true;
       return { ...state, tabs };
     case CHANGE_FOLDER:
       tabs[tabIndex].data.forEach(row => {

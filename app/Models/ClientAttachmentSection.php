@@ -9,6 +9,16 @@ class ClientAttachmentSection extends Model
 {
     use HasFactory;
 
+    protected $attributes = [
+      'id' => null,
+      'Наименование' => '',
+      'ТекстДляПечати' => '',
+      'ТекстПриложения' => '',
+      'ТекстОтсутствиеПриложения' => '',
+      'Порядок' => 0,
+      'КонтролироватьСбор' => 0,
+    ];
+
     protected $guarded = [];
 
     public $timestamps = false;

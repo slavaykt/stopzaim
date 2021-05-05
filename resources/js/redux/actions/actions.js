@@ -134,7 +134,6 @@ export const changeFolder = (tabId, api, row_ids, parent_id) => {
 
 export const deleteRow = (tabId, api, tabApi, row_ids) => {
   return async dispatch => {
-    console.log(api + '/' + row_ids.join());
     const response = await Axios.delete(api + '/' + row_ids.join());
     if (response.status === 204) {
       dispatch(

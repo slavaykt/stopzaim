@@ -10,7 +10,9 @@ use App\Http\Controllers\ClientSettlementRegisterController;
 use App\Http\Controllers\CollectingManagementController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ContractController;
+use App\Http\Controllers\RegisterController;
 use App\Models\ClientSettlementRegister;
+use App\Models\Register;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +54,8 @@ Route::resource('cash/orders/expense', CashExpenseOrderController::class)->param
 Route::resource('collectingManagement', CollectingManagementController::class)->only(['index','store']);
 
 Route::get('cash', [CashOrderController::class, 'index']);
+
+Route::post('register', [RegisterController::class, 'store']);
 
 Route::get('config', function () {
   $config =  [

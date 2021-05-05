@@ -15,7 +15,7 @@ const ContractEdit = () => {
   const { tabId } = tabContext;
   const { data, sourceTabId } = useSelector(state => state.app.getTab(tabId));
   const enumerations = useSelector(state => state.config.enumerations);
-  const { contractRegisterHandler, contractUnregisterHandler } = useRegisterHandler();
+  const { contractRegisterHandler } = useRegisterHandler();
   const baseApi = '/api/contracts';
   const [layout, setLayout] = useState(
     [
@@ -93,13 +93,15 @@ const ContractEdit = () => {
         { label: 'Договор', url: `/print/contract/${data.id}` },
       ];
 
+  const requiredForRegister = ['Клиент'];    
+
   return (
     <TabContext.Provider value={{ ...tabContext, sourceTabId }}>
       <EditForm
         layout={layout}
         printOptions={printOptions}
         registerHandler={contractRegisterHandler}
-        unRegisterHandler={contractUnregisterHandler}
+        requiredForRegister={requiredForRegister}
         api={baseApi} />
     </TabContext.Provider>
   )

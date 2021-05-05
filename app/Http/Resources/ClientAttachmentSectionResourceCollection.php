@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\ClientAttachmentSection;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Config;
 
@@ -18,6 +19,7 @@ class ClientAttachmentSectionResourceCollection extends ResourceCollection
     return [
       'data' => $this->collection,
       'default' => Config::get('enumerations.attachment.sections'),
+      'schema' => new ClientAttachmentSection
     ];
   }
 }

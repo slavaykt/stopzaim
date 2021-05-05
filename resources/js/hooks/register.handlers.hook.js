@@ -7,197 +7,113 @@ export const useRegisterHandler = () => {
 
   const dispatch = useDispatch();
 
-  const cashIncomeRegisterHandler = useCallback(async (tabId, data, tabType) => {
-    const baseApi = '/api/cash/orders/income';
-    const payloadToCash = {
-      method: 'updateOrCreate',
-      registerable_type: "App\\Models\\CashIncomeOrder",
-      registerable_id: data.id,
-      startDate: data.Дата,
-      data: [
-        {
-          Дата: data.Дата,
-          СуммаПриход: tabType === 'index' ? data.Приход : data.Сумма,
-          registerable_type: "App\\Models\\CashIncomeOrder",
-          registerable_id: data.id,
-        }
-      ]
-    };
-    const responseFromCash = await axios.post('api/cash_register', payloadToCash);
-
-    if (!data.Клиент) {
-      if (responseFromCash.status === 201) {
-        await dispatch(handleRegister(tabId, baseApi, data, tabType, 1));
-      }
-      return;
-    }
-    const payloadToClientSettlement = {
-      method: 'updateOrCreate',
-      registerable_type: "App\\Models\\CashIncomeOrder",
-      registerable_id: data.id,
-      startDate: data.Дата,
-      data: [
-        {
-          Дата: data.Дата,
-          Клиент: data.Клиент.id,
-          СуммаРасход: tabType === 'index' ? data.Приход : data.Сумма,
-          registerable_type: "App\\Models\\CashIncomeOrder",
-          registerable_id: data.id,
-        }
-      ]
-    };
-    const responseFromClientSettlement = await axios.post('api/client_settlement_register', payloadToClientSettlement);
-    if (responseFromCash.status === 201 && responseFromClientSettlement.status === 201) {
-      await dispatch(handleRegister(tabId, baseApi, data, tabType, 1));
-    }
-  }, [])
-
-  const cashIncomeUnregisterHandler = useCallback(async (tabId, data, tabType) => {
-    const baseApi = '/api/cash/orders/income';
-    const payloadToCash = {
-      method: 'delete',
-      registerable_type: "App\\Models\\CashIncomeOrder",
-      registerable_id: data.id,
-      startDate: data.Дата,
-      data: [
-        {
-          Дата: data.Дата,
-          СуммаПриход: tabType === 'index' ? data.Приход : data.Сумма,
-          registerable_type: "App\\Models\\CashIncomeOrder",
-          registerable_id: data.id,
-        }
-      ]
-    };
-    const responseFromCash = await axios.post('api/cash_register', payloadToCash);
-    if (!data.Клиент) {
-      if (responseFromCash.status === 201) {
-        await dispatch(handleRegister(tabId, baseApi, data, tabType, 1));
-      }
-      return;
-    }
-    const payloadToClientSettlement = {
-      method: 'delete',
-      registerable_type: "App\\Models\\CashIncomeOrder",
-      registerable_id: data.id,
-      startDate: data.Дата,
-      data: [
-        {
-          Дата: data.Дата,
-          Клиент: data.Клиент.id,
-          СуммаРасход: tabType === 'index' ? data.Приход : data.Сумма,
-          registerable_type: "App\\Models\\CashIncomeOrder",
-          registerable_id: data.id,
-        }
-      ]
-    };
-    const responseFromClientSettlement = await axios.post('api/client_settlement_register', payloadToClientSettlement);
-    if (responseFromCash.status === 201 && responseFromClientSettlement.status === 201) {
-      await dispatch(handleRegister(tabId, baseApi, data, tabType, 0));
-    }
-  }, [])
-
-  const cashExpenseRegisterHandler = useCallback(async (tabId, data, tabType) => {
-    const baseApi = '/api/cash/orders/expense';
+  const cashIncomeRegisterHandler = useCallback(async (method, data, tabType) => {
     const payload = {
-      method: 'updateOrCreate',
-      registerable_type: "App\\Models\\CashExpenseOrder",
-      registerable_id: data.id,
-      startDate: data.Дата,
-      data: [
-        {
-          Дата: data.Дата,
-          СуммаРасход: tabType === 'index' ? data.Расход : data.Сумма,
-          registerable_type: "App\\Models\\CashExpenseOrder",
-          registerable_id: data.id,
+      method: method,
+      data: data.map(el => {
+        const result = [];
+        result.push(
+          {
+            registerName: 'App\\Models\\CashRegister',
+            registerable_type: "App\\Models\\CashIncomeOrder",
+            registerable_id: el.id,
+            startDate: el.Дата,
+            data: [
+              {
+                Дата: el.Дата,
+                СуммаПриход: tabType === 'index' ? el.Приход : el.Сумма,
+              }
+            ]
+          }
+        );
+        if (el.Клиент) {
+          result.push(
+            {
+              registerName: 'App\\Models\\ClientSettlementRegister',
+              registerable_type: "App\\Models\\CashIncomeOrder",
+              registerable_id: el.id,
+              startDate: el.Дата,
+              data: [
+                {
+                  Дата: el.Дата,
+                  Клиент: el.Клиент.id,
+                  СуммаРасход: tabType === 'index' ? el.Приход : el.Сумма,
+                }
+              ]
+            }
+          );
         }
-      ]
+        return result;
+      })
     };
-    const res = await axios.post('api/cash_register', payload);
-    if (res.status === 201) {
-      await dispatch(handleRegister(tabId, baseApi, data, tabType, 1));
-    }
+    const response = await axios.post('api/register', payload);
+
+    return response.status;
   }, [])
 
-  const cashExpenseUnregisterHandler = useCallback(async (tabId, data, tabType) => {
-    const baseApi = '/api/cash/orders/expense';
+  const cashExpenseRegisterHandler = useCallback(async (method, data, tabType) => {
     const payload = {
-      method: 'delete',
-      registerable_type: "App\\Models\\CashExpenseOrder",
-      registerable_id: data.id,
-      startDate: data.Дата,
-      data: [
-        {
-          Дата: data.Дата,
-          СуммаРасход: tabType === 'index' ? data.Расход : data.Сумма,
-          registerable_type: "App\\Models\\CashExpenseOrder",
-          registerable_id: data.id,
-        }
-      ]
+      method: method,
+      data: data.map(el => {
+        const result = [];
+        result.push(
+          {
+            registerName: 'App\\Models\\CashRegister',
+            registerable_type: "App\\Models\\CashExpenseOrder",
+            registerable_id: el.id,
+            startDate: el.Дата,
+            data: [
+              {
+                Дата: el.Дата,
+                СуммаРасход: tabType === 'index' ? el.Расход : el.Сумма,
+              }
+            ]
+          }
+        );
+        return result;
+      })
     };
-    const res = await axios.post('api/cash_register', payload);
-    if (res.status === 201) {
-      await dispatch(handleRegister(tabId, baseApi, data, tabType, 0));
-    }
+    const response = await axios.post('api/register', payload);
+
+    return response.status;
   }, [])
 
-  const contractRegisterHandler = useCallback(async (tabId, data, tabType) => {
-    const baseApi = '/api/contracts';
-    if (!data.Клиент) return;
+  const contractRegisterHandler = useCallback(async (method, data, tabType) => {
     const payload = {
-      method: 'updateOrCreate',
-      registerable_type: "App\\Models\\Contract",
-      registerable_id: data.id,
-      startDate: data.ГрафикПлатежей.reduce((result, el) => {
-        if (result) {
-          return el.Дата < result ? el.Дата : result;
-        } else {
-          return el.Дата;
+      method: method,
+      data: data.map(el => {
+        const result = [];
+        if (!el.Клиент) {
+          return result;
         }
-      }, null),
-      data: data.ГрафикПлатежей.map(el => (
-        {
-          Дата: el.Дата,
-          Клиент: data.Клиент.id,
-          СуммаПриход: el.Сумма,
-          registerable_type: "App\\Models\\Contract",
-          registerable_id: data.id,
-        }
-      ))
+        result.push(
+          {
+            registerName: 'App\\Models\\ClientSettlementRegister',
+            registerable_type: "App\\Models\\Contract",
+            registerable_id: el.id,
+            startDate: el.ГрафикПлатежей.reduce((result, item) => {
+              if (result) {
+                return item.Дата < result ? item.Дата : result;
+              } else {
+                return item.Дата;
+              }
+            }, null),
+            data: el.ГрафикПлатежей.map(item => (
+              {
+                Дата: item.Дата,
+                Клиент: el.Клиент.id,
+                СуммаПриход: item.Сумма,
+              }
+            ))
+          }
+        );
+        return result;
+      }),
     };
-    const res = await axios.post('api/client_settlement_register', payload);
-    if (res.status === 201) {
-      await dispatch(handleRegister(tabId, baseApi, data, tabType, 1));
-    }
+    const response = await axios.post('api/register', payload);
+
+    return response.status;
   }, [])
 
-  const contractUnregisterHandler = useCallback(async (tabId, data, tabType) => {
-    const baseApi = '/api/contracts';
-    const payload = {
-      method: 'delete',
-      registerable_type: "App\\Models\\Contract",
-      registerable_id: data.id,
-      startDate: data.ГрафикПлатежей.reduce((result, el) => {
-        if (result) {
-          return el.Дата < result ? el.Дата : result;
-        } else {
-          return el.Дата;
-        }
-      }, null),
-      data: data.ГрафикПлатежей.map(el => (
-        {
-          Дата: el.Дата,
-          Клиент: data.Клиент.id,
-          СуммаПриход: el.Сумма,
-          registerable_type: "App\\Models\\Contract",
-          registerable_id: data.id,
-        }
-      ))
-    }
-    const res = await axios.post('api/client_settlement_register', payload);
-    if (res.status === 201) {
-      await dispatch(handleRegister(tabId, baseApi, data, tabType, 0));
-    }
-  }, [])
-
-  return { cashIncomeRegisterHandler, cashIncomeUnregisterHandler, cashExpenseRegisterHandler, cashExpenseUnregisterHandler, contractRegisterHandler, contractUnregisterHandler }
+  return { cashIncomeRegisterHandler, cashExpenseRegisterHandler, contractRegisterHandler }
 }

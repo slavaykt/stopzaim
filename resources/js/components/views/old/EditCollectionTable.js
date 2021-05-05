@@ -54,6 +54,8 @@ const EditCollectionTable = ({ columns, collection }) => {
     dispatch(addCollectionRow(tabIndex, collection, { ...schema }))
   }
 
+  console.log('yes');
+
   const handleDeleteRow = (rowIndex) => {
     dispatch(deleteCollectionRow(tabIndex, collection, rowIndex));
   }

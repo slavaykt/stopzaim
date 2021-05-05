@@ -43,7 +43,6 @@ class ClientSettlementRegisterController extends Controller
 
   public function store(Request $request)
   {
-    logger('ClientSettlementRegisterController');
     return Register::store($request, 'App\Models\ClientSettlementRegister');
   }
 

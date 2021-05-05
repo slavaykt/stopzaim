@@ -16,68 +16,36 @@ class Register extends Model
     return $this->morphTo();
   }
 
-  public static function store($request, $model)
+  public static function store($request)
   {
     try {
-      $data = $model::where([['registerable_type', $request->registerable_type], ['registerable_id', $request->registerable_id]])->get()->toArray();
-      if ($request->method === 'updateOrCreate') {     
-        try {
-          $model::where([['registerable_type', $request->registerable_type], ['registerable_id', $request->registerable_id]])->delete();
-          foreach ($request->data as $row) {
-            $model::create($row);
+      foreach ($request->data as $doc) {
+        foreach ($doc as $reg) {
+          $model = $reg['registerName'];
+          $data = $model::where([['registerable_type', $reg['registerable_type']], ['registerable_id', $reg['registerable_id']]])->get()->toArray();
+          $model::where([['registerable_type', $reg['registerable_type']], ['registerable_id', $reg['registerable_id']]])->delete();
+          if ($request->method === 'updateOrCreate') {
+            foreach ($reg['data'] as &$row) {
+              $row['registerable_type'] = $reg['registerable_type'];
+              $row['registerable_id'] = $reg['registerable_id'];
+              $model::create($row);
+              $data[] = $row;
+            }
           }
-          $data = array_merge($data,$request->data);
-          event(new onRegisterSaving($request->startDate, $model, $data));
-        } catch (\Throwable $th) {
-          logger($th->getMessage());
-        }
-      } else if ($request->method === 'delete') {
-        logger($model);
-        try {
-          $model::where([['registerable_type', $request->registerable_type], ['registerable_id', $request->registerable_id]])->delete();
-          event(new onRegisterSaving($request->startDate, $model, $data));
-        } catch (\Throwable $th) {
-          logger($th->getMessage());
+          event(new onRegisterSaving($reg['startDate'], $model, $data));
+          $docModel = $reg['registerable_type'];
+          $registrator = $docModel::find($reg['registerable_id']);
+          if (!empty($registrator)) {
+            $registrator->registered = $request->method === 'updateOrCreate' ? 1 : 0;
+            $registrator->save();
+          }
         }
       }
       return response()->json('success!', 201);
     } catch (\Throwable $th) {
-      return response($th->getMessage(), 201);
+      logger($th->getMessage());
+      return response($th->getMessage(), 400);
     }
   }
 
-  // public function isLatest()
-  // {
-  //   return get_class($this)::where('Дата', '>', $this->Дата)->count() > 0 ? false : true;
-  // }
-
-  // protected static function boot()
-  // {
-  //   parent::boot();
-
-  //   function recount_remains($reg)
-  //   {
-  //     if (!$reg->isLatest()) {
-  //       $current_remain = $reg->Остаток;
-  //       foreach (get_class($reg)::where('Дата', '>', $reg->Дата)->orderBy('Дата', 'asc')->get() as $record) {
-  //         $current_remain = $current_remain + $record->Приход - $record->Расход;
-  //         $record->Остаток = $current_remain;
-  //         $record->save();
-  //       }
-  //     }
-  //   }
-
-  //   static::saving(function ($reg) {
-  //     $remain_before = CashRegister::where('Дата', '<', $reg->Дата)->sum('Приход') - CashRegister::where('Дата', '<', $reg->Дата)->sum('Расход');
-  //     $reg->Остаток = $remain_before + $reg->Приход - $reg->Расход;
-  //   });
-
-  //   static::saved(function ($reg) {
-  //     recount_remains($reg);
-  //   });
-
-  //   static::deleted(function ($reg) {
-  //     recount_remains($reg);
-  //   });
-  // }
 }

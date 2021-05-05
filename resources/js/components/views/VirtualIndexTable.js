@@ -55,6 +55,7 @@ function VirtualIndexTable({ doubleClickHandler, columns, loading }) {
         return prevDate - nextDate;
       });
 
+
   const ctrlDown = useKeypress('Control');
 
   const handleClick = ({ index }) => {
@@ -98,6 +99,7 @@ function VirtualIndexTable({ doubleClickHandler, columns, loading }) {
               gridClassName={classes.grid}
               rowHeight={53}
               rowCount={sortedData.length}
+              scrollToIndex={sortedData.length - 1}
               rowGetter={({ index }) => sortedData[index]}
               onRowClick={handleClick}
               onRowDoubleClick={doubleClickHandler}>

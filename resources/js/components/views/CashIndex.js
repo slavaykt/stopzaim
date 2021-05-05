@@ -33,7 +33,7 @@ const CashIndex = () => {
   const { data, api: tabApi } = useSelector(state => state.app.getTab(tabId));
   const classes = useStyles();
   const [{ data: fetchedData, loading, error }, refetch] = useAxios(tabApi, { useCache: false });
-  const { cashIncomeRegisterHandler, cashIncomeUnregisterHandler, cashExpenseRegisterHandler, cashExpenseUnregisterHandler } = useRegisterHandler();
+  const { cashIncomeRegisterHandler, cashExpenseRegisterHandler } = useRegisterHandler();
 
   useEffect(() => {
     if (fetchedData) {
@@ -131,24 +131,23 @@ const CashIndex = () => {
     dispatch(addTab('Новый ' + name, `${api}/${String(rowData.id)}/edit?copy=true`, component, tabId));
   }
 
-  const handleRegister = () => {
-    data.filter(el => el.isActive && !el.registered).map(rowData => {
-      if (rowData.ВидДокумента === 'Приходный кассовый ордер') {
-        cashIncomeRegisterHandler(tabId, rowData, 'index');
-      } else if (rowData.ВидДокумента === 'Расходный кассовый ордер') {
-        cashExpenseRegisterHandler(tabId, rowData, 'index');
+  const handleRegister = async (isRegister) => {
+    const method = isRegister ? 'updateOrCreate' : 'delete';
+    const dataToRegister = data.filter(el => el.isActive && el.registered !== isRegister);
+    const CashIncomeToRegister = dataToRegister.filter(el => el.ВидДокумента === 'Приходный кассовый ордер');
+    if (CashIncomeToRegister.length) {
+      const status = await cashIncomeRegisterHandler(method, CashIncomeToRegister, 'index');
+      if (status === 201) {
+        handleRefetch();
       }
-    });
-  }
-
-  const handleUnRegister = () => {
-    data.filter(el => el.isActive && el.registered).map(rowData => {
-      if (rowData.ВидДокумента === 'Приходный кассовый ордер') {
-        cashIncomeUnregisterHandler(tabId, rowData, 'index');
-      } else if (rowData.ВидДокумента === 'Расходный кассовый ордер') {
-        cashExpenseUnregisterHandler(tabId, rowData, 'index');
+    }
+    const CashExpenseToRegister = dataToRegister.filter(el => el.ВидДокумента === 'Расходный кассовый ордер');
+    if (CashExpenseToRegister.length) {
+      const status = await cashExpenseRegisterHandler(method, CashExpenseToRegister, 'index');
+      if (status === 201) {
+        handleRefetch();
       }
-    });
+    }
   }
 
   const handleRefetch = () => {
@@ -184,14 +183,14 @@ const CashIndex = () => {
         <ExtendableButton
           variant="contained"
           startIcon={<CheckCircle color="primary" />}
-          onClick={handleRegister}
+          onClick={() => handleRegister(1)}
         >
           <Typography variant="body2">Провести</Typography>
         </ExtendableButton>
         <ExtendableButton
           variant="contained"
           startIcon={<Cancel color="primary" />}
-          onClick={handleUnRegister}
+          onClick={() => handleRegister(0)}
         >
           <Typography variant="body2">Отменить проведение</Typography>
         </ExtendableButton>

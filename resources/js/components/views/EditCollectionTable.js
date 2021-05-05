@@ -100,7 +100,6 @@ const EditCollectionTable = ({ columns, collection }) => {
   const handleAddRow = () => {
     dispatch(addCollectionRow(tabId, collection, { ...schema }));
     setActiveRow(data.length - 1);
-    // scrollToBottom();
   }
 
   const handleDeleteRow = () => {
