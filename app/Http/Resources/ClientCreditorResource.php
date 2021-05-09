@@ -12,7 +12,7 @@ class ClientCreditorResource extends JsonResource
       return [
         'id' => $this->id,
         'СодержаниеОбязательства' => $this->СодержаниеОбязательства,
-        'Кредитор' => $this->creditor,
+        'Кредитор' => new CompanyResource($this->creditor),
         'ОснованиеВозникновения' => $this->ОснованиеВозникновения,
         'СуммаВсего' => $this->СуммаВсего,
         'СуммаЗадолженность' => $this->СуммаЗадолженность,

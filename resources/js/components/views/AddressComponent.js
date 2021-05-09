@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Link from '@material-ui/core/Link';
 import { useAddress } from '../../hooks/address.hook';
-import { changeData } from '../../redux/actions/actions';
+import { changeCollectionData, changeData } from '../../redux/actions/actions';
 import DialogWrapper from './DialogWrapper';
 import { TabContext } from '../context';
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -110,7 +110,12 @@ const AddressComponent = (props) => {
   const [data, setData] = useState(props.data);
 
   const handleSubmit = (e) => {
-    dispatch(changeData(tabId, 'Адрес', { ...data }));
+    if (props.collection) {
+      dispatch(changeCollectionData(tabId,props.collection,props.index,'Адрес', { ...data }))
+      console.log(data);
+    } else {
+      dispatch(changeData(tabId, 'Адрес', { ...data })); 
+    }  
     handleClose();
   }
 

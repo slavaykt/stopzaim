@@ -4,7 +4,6 @@ import CheckBoxOutlinedIcon from '@material-ui/icons/CheckBoxOutlined';
 import CheckBoxOutlineBlankOutlinedIcon from '@material-ui/icons/CheckBoxOutlineBlankOutlined';
 import { useDateFormat } from '../../hooks/date.format.hook';
 import { TabContext } from '../context';
-import DocumentsIndexTable from './DocumentsIndexTable';
 import VirtualIndexTable from './VirtualIndexTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { addTab, deleteRow, loadData } from '../../redux/actions/actions';

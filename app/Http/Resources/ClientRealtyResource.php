@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Address;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ClientRealtyResource extends JsonResource
@@ -22,7 +23,8 @@ class ClientRealtyResource extends JsonResource
         'Площадь' => $this->Площадь,
         'ОснованиеПриобретения' => $this->ОснованиеПриобретения,
         'СведенияОЗалоге' => $this->СведенияОЗалоге,
-        'Адрес' => $this->Адрес,
+        'АдресOld' => $this->АдресOld,
+        'Адрес' => new AddressResource($this->address ? $this->address : new Address),
       ];
     }
 }

@@ -22,7 +22,7 @@ class ClientRealty extends Model
       'Площадь' => 0,
       'ОснованиеПриобретения' => '',
       'СведенияОЗалоге' => '',
-      'Адрес' => ''
+      'АдресOld' => ''
     ];
 
     public function getTypeAttribute()
@@ -38,5 +38,10 @@ class ClientRealty extends Model
     public function deals()
     {
       return $this->morphMany(ClientDeal::class, 'dealable');
+    }
+
+    public function address()
+    {
+      return $this->morphOne(Address::class, 'registerable');
     }
 }

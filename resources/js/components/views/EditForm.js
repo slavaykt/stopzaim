@@ -1,29 +1,17 @@
-import React, { useContext, useEffect, useState } from 'react';
-import Axios from 'axios';
+import React, { useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeData, closeTab, deleteRecord, loadData, refetchTab } from '../../redux/actions/actions';
+import { changeData } from '../../redux/actions/actions';
 import views from '../views/views';
-import { TextField, Grid, InputLabel, FormControl, Typography, Select, Tabs, MenuItem, FormControlLabel, Checkbox, Tab, Snackbar } from '@material-ui/core';
-import MuiAlert from '@material-ui/lab/Alert';
+import { TextField, Grid, InputLabel, FormControl, Select, Tabs, MenuItem, FormControlLabel, Checkbox, Tab } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Save as SaveIcon, ExitToApp as ExitToAppIcon, Cancel as CancelIcon, CheckCircle as CheckCircleIcon, Delete as DeleteIcon, Print as PrintIcon, RssFeedRounded, Refresh } from '@material-ui/icons';
 import { TabContext } from '../context';
 import EditCollectionTable from './EditCollectionTable';
 import SelectTable from './SelectTable';
 import EditCollectionAccordion from './EditCollectionAccordion';
-import ConfirmableButton from './ConfirmableButton';
-import ExtendableButton from './ExtendableButton';
-import DropDownButton from './DropDownButton';
-import useAxios from 'axios-hooks';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import AlertComponent from './AlertComponent';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    '& > *': {
-      margin: theme.spacing(1),
-    },
-  },
-  buttonGroup: {
     '& > *': {
       margin: theme.spacing(1),
     },
@@ -49,27 +37,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Alert = (props) => {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
-
-function EditForm({ layout, api, registerHandler, printOptions, requiredForRegister }) {
+function EditForm({ layout }) {
 
   const dispatch = useDispatch();
-  const { tabId, sourceTabId } = useContext(TabContext);
-  const sourceTab = useSelector(state => state.app.getTab(sourceTabId));
-  const { data, api: tabApi } = useSelector(state => state.app.getTab(tabId));
+  const { tabId } = useContext(TabContext);
+  const { data } = useSelector(state => state.app.getTab(tabId));
   const [activeTab, setActiveTab] = useState(0);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
   const classes = useStyles();
-  const [{ data: fetchedData, loading, error: fetchError }, refetch] = useAxios(tabApi, { useCache: false });
-
-  useEffect(() => {
-    if (fetchedData) {
-      dispatch(loadData(tabId, fetchedData));
-    }
-  }, [fetchedData]);
 
   const SelectTableOnSubmit = (node) => (row) => {
     dispatch(changeData(tabId, node.key, { ...row }));
@@ -233,146 +207,12 @@ function EditForm({ layout, api, registerHandler, printOptions, requiredForRegis
     }
   }
 
-  const handleSubmit = async (refetch) => {
-    setSaving(true);
-    const res = data.id ? await Axios.put(api + '/' + String(data.id), data) : await Axios.post(api, data);
-    if (res.status === 200 || res.status === 201) {
-      const resData = await res.data;
-      if (resData.Комментарий === 'Номер не уникальный') {
-        setError('Номер не уникальный!');
-      } else {
-        if (!data.id) {
-          dispatch(changeData(tabId, 'id', resData.id));
-          if (resData.Номер) {
-            dispatch(changeData(tabId, 'Номер', resData.Номер));
-          }
-        }
-        if (refetch) {
-          dispatch(refetchTab(sourceTab));
-          handleRefetch();
-        }
-      }
-      setSaving(false);
-    }
-  }
-
-  const handleDelete = async () => {
-    dispatch(deleteRecord(tabId, api, data.id));
-    dispatch(refetchTab(sourceTab));
-  }
-
-  const handleRegister = async (isRegister) => {
-    if (isRegister) {
-      if (requiredForRegister) {
-        let errorText = '';
-        requiredForRegister.map(required=>{
-          if (!data[required]) {
-            errorText += `Не заполнено поле ${required} `
-          }
-        })
-        if (errorText) {
-          setError(errorText);
-          return
-        }
-      }
-      await handleSubmit(false)
-    }
-    const method = isRegister ? 'updateOrCreate' : 'delete';
-    await registerHandler(method, [data], 'edit');
-    dispatch(refetchTab(sourceTab));
-    handleRefetch();
-  }
-
-  const handleCloseTab = () => {
-    dispatch(closeTab(tabId));
-  }
-
-  const handlePrint = (url) => {
-    window.open(url, '_blank');
-  }
-
-  const handleClearError = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setError('');
-  };
-
-  const handleRefetch = () => {
-    refetch();
-  }
-
   return (
     <form >
-      <div className={classes.buttonGroup}>
-        <ExtendableButton
-          variant="contained"
-          startIcon={<SaveIcon color="primary" />}
-          onClick={()=>handleSubmit(true)}
-        >
-          <Typography variant="body2">Записать</Typography>
-        </ExtendableButton>
-        {registerHandler &&
-          <ExtendableButton
-            variant="contained"
-            startIcon={<CheckCircleIcon color="primary" />}
-            onClick={() => handleRegister(1)}
-          >
-            <Typography variant="body2">Провести</Typography>
-          </ExtendableButton>
-        }
-        {(registerHandler && data) &&
-          <ExtendableButton
-            variant="contained"
-            startIcon={<CancelIcon color={data.registered ? 'primary' : 'disabled'} />}
-            disabled={!data.registered}
-            onClick={() => handleRegister(0)}
-          >
-            <Typography variant="body2">Отменить проведение</Typography>
-          </ExtendableButton>
-        }
-        {!!printOptions.length &&
-          <DropDownButton
-            icon={<PrintIcon color="primary" />}
-            buttonLabel="Печать"
-            options={
-              printOptions.map(option => (
-                { label: option.label, handler: () => handlePrint(option.url) }
-              ))
-            } />
-        }
-        <ConfirmableButton
-          title="Вы уверены?"
-          handler={handleDelete}
-          icon={<DeleteIcon color="primary" />}
-          buttonLabel="Удалить" />
-        <ExtendableButton
-          variant="contained"
-          startIcon={<ExitToAppIcon color="primary" />}
-          onClick={handleCloseTab}
-        >
-          <Typography variant="body2">Закрыть</Typography>
-        </ExtendableButton>
-        <ExtendableButton
-          variant="contained"
-          startIcon={<Refresh color="primary" />}
-          onClick={handleRefetch}
-        >
-          <Typography variant="body2">Обновить</Typography>
-        </ExtendableButton>
-      </div>
       <Grid container spacing={1}>
-        {(saving || loading) &&
-          <Grid item xs={12}>
-            <LinearProgress />
-          </Grid>}
-        {data && layout.map((node, nodeIndex) => renderNode(node, nodeIndex))}
+        {layout.map((node, nodeIndex) => renderNode(node, nodeIndex))}
       </Grid>
-      <Snackbar open={!!error} autoHideDuration={6000} onClose={handleClearError}>
-        <Alert onClose={handleClearError} severity="error">
-          {error}
-        </Alert>
-      </Snackbar>
+      <AlertComponent tabId={tabId} />
     </form>
   )
 }

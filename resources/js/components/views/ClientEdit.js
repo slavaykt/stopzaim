@@ -2,21 +2,46 @@ import React, { useContext, useEffect, useState } from 'react';
 import useAxios from "axios-hooks";
 import EditForm from './EditForm';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeCollectionData, setLayout } from '../../redux/actions/actions';
+import { changeCollectionData, loadData } from '../../redux/actions/actions';
 import { TabContext } from '../context';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import StandardEditButtons from './StandardEditButtons';
+import { LinearProgress, makeStyles, Typography } from '@material-ui/core';
+import { ImportExport, Print } from '@material-ui/icons';
+import ExtendableButton from './ExtendableButton';
+import PrintButton from './PrintButton';
+import { useDateFormat } from '../../hooks/date.format.hook';
+
+const useStyles = makeStyles((theme) => ({
+  buttonGroup: {
+    '& > *': {
+      margin: theme.spacing(1),
+    },
+  },
+}));
 
 const ClientEdit = () => {
 
   const dispatch = useDispatch();
   const tabContext = useContext(TabContext);
   const { tabId } = tabContext;
-  const { data, sourceTabId } = useSelector(state => state.app.getTab(tabId));
   const enumerations = useSelector(state => state.config.enumerations);
-  const [{ data: attachmentSection, loading, error }, refetch] = useAxios(
+  const [layout, setLayout] = useState([]);
+  const { data, sourceTabId, api: tabApi } = useSelector(state => state.app.getTab(tabId));
+  const [{ data: attachmentSection, loading: loadingAttachments, error: fetchAttachmentsError }] = useAxios(
     "api/attachment/sections"
   );
-  const [layout, setLayout] = useState([]);
+  const [{ data: fetchedData, loading, error: fetchError }, refetch] = useAxios(tabApi, { useCache: false });
+  const [saving, setSaving] = useState(false);
+  const { localeDate } = useDateFormat();
+  const classes = useStyles();
+
+  console.log(data);
+
+  useEffect(() => {
+    if (fetchedData) {
+      dispatch(loadData(tabId, fetchedData));
+    }
+  }, [fetchedData]);
 
   useEffect(() => {
     if (attachmentSection) {
@@ -507,10 +532,16 @@ const ClientEdit = () => {
                     },
                     {
                       type: 'input',
-                      label: 'Адрес',
-                      key: 'Адрес',
+                      label: 'Адрес старый формат',
+                      key: 'АдресOld',
                       inputType: 'text',
                       size: 6
+                    },
+                    {
+                      type: 'modalComponent',
+                      componentName: 'AddressComponent',
+                      key: 'Адрес',
+                      size: 12,
                     },
                   ]
                 }
@@ -582,10 +613,16 @@ const ClientEdit = () => {
                     },
                     {
                       type: 'input',
-                      label: 'Адрес',
-                      key: 'Адрес',
+                      label: 'Адрес старый формат',
+                      key: 'АдресOld',
                       inputType: 'text',
                       size: 8
+                    },
+                    {
+                      type: 'modalComponent',
+                      componentName: 'AddressComponent',
+                      key: 'Адрес',
+                      size: 12,
                     },
                   ]
                 }
@@ -688,29 +725,184 @@ const ClientEdit = () => {
   }, [attachmentSection])
 
   const printOptions =
-    !data
+    data
       ?
-      []
-      :
       [
         { label: 'Заявление', url: `/print/clients/${data.id}/application` },
         { label: 'Список кредиторов и должников', url: `/print/clients/${data.id}/creditorsList` },
         { label: 'Опись имущества', url: `/print/clients/${data.id}/propertyList` },
-      ];
+      ]
+      :
+      [];
 
-
-  if (loading) {
-    return <CircularProgress />
-  } else {
-    return (
-      <TabContext.Provider value={{ ...tabContext, sourceTabId }}>
-        <EditForm
-          layout={layout}
-          printOptions={printOptions}
-          api="api/clients" />
-      </TabContext.Provider>
-    )
+  const getExportData = () => {
+    const getCity = (address)=> {
+      return address.регион.viewName.toLowerCase().includes('москва') ? address.регион.viewName : address.город.viewName + address.населенныйПункт.viewName;
+    };
+    const exportData = {
+      Истец: {
+        INN: data.ИНН,
+        Snils: data.СНИЛС,
+        LastName: data.Фамилия,
+        FirstName: data.Имя,
+        MiddleName: data.Отчество,
+        DocumentType: 'паспорт РФ',
+        DocumentInfo: `${data.Паспорт.Серия}, ${data.Паспорт.Номер}`,
+        BirthDate: localeDate(data.ДатаРождения),
+        BirthCity: data.МестоРождения,
+        "Addresses.1.Country": 'Российская Федерация',
+        "Addresses.1.Region": data.Адрес.регион.viewName,
+        "Addresses.1.City": getCity(data.Адрес),
+        "Addresses.1.District": data.Адрес.район.viewName,
+        "Addresses.1.Street": data.Адрес.улица.viewName,
+        "Addresses.1.House": data.Адрес.дом.viewName,
+        "Addresses.1.Corps": data.Адрес.корпус,
+        "Addresses.1.Office": data.Адрес.квартира,
+        "Addresses.1.ZipCode": data.Адрес.индекс,
+        "Addresses.0.Country": 'Российская Федерация',
+        "Addresses.0.Region": data.Адрес.регион.viewName,
+        "Addresses.0.City": getCity(data.Адрес),
+        "Addresses.0.District": data.Адрес.район.viewName,
+        "Addresses.0.Street": data.Адрес.улица.viewName,
+        "Addresses.0.House": data.Адрес.дом.viewName,
+        "Addresses.0.Corps": data.Адрес.корпус,
+        "Addresses.0.Office": data.Адрес.квартира,
+        "Addresses.0.ZipCode": data.Адрес.индекс,
+        Phone2: data.Телефон,
+        EMail: 'slava_ykt@mail.ru'
+      },
+      НедвижимоеИмущество: data.НедвижимоеИмущество.map(el => (
+        {
+          "index.RealtyType": el.ВидИмущества,
+          "index.OwnerShip": el.ВидСобственности,
+          "index.NameObject": el.Наименование,
+          "index.Area": String(el.Площадь),
+          "index.BasisOfAcquisition": el.ОснованиеПриобретения,
+          "index.InformationOnPledge": el.СведенияОЗалоге,
+          "index.Address.Country": 'Российская Федерация',
+          "index.Address.Region": el.Адрес.регион.viewName,
+          "index.Address.District": el.Адрес.район.viewName,
+          "index.Address.City": getCity(el.Адрес),
+          "index.Address.Street": el.Адрес.улица.viewName,
+          "index.Address.House": el.Адрес.дом.viewName,
+          "index.Address.Corps": el.Адрес.корпус,
+          "index.Address.Office": el.Адрес.квартира,
+          "index.Address.ZipCode": el.Адрес.индекс,
+        }
+      )),
+      ДвижимоеИмущество: data.ДвижимоеИмущество.map(el => (
+        {
+          "index.AutoType": el.ВидТС,
+          "index.OwnerShip": el.ВидСобственности,
+          "index.Model": el.Наименование,
+          "index.Number": el.ИдентификационныйНомер,
+          "index.Year": el.ГодВыпуска,
+          "index.Cost": String(el.Стоимость),
+          "index.InformationOnPledge": el.СведенияОЗалоге,
+          "index.Address.Country": 'Российская Федерация',
+          "index.Address.Region": el.Адрес.регион.viewName,
+          "index.Address.District": el.Адрес.район.viewName,
+          "index.Address.City": getCity(el.Адрес),
+          "index.Address.Street": el.Адрес.улица.viewName,
+          "index.Address.House": el.Адрес.дом.viewName,
+          "index.Address.Corps": el.Адрес.корпус,
+          "index.Address.Office": el.Адрес.квартира,
+          "index.Address.ZipCode": el.Адрес.индекс,
+        }
+      )),
+      БанковскиеСчета: data.БанковскиеСчета.map(el => (
+        {
+          "index.BankName": el.Банк.Наименование,
+          "index.ScoreType": el.ВидСчета,
+          "index.Currency": el.ВалютаСчета,
+          "index.OpenDate": localeDate(el.ДатаОткрытия),
+          "index.Balance": String(el.Остаток),
+          "index.Address.Country": 'Российская Федерация',
+          "index.Address.Region": el.Банк.Адрес.регион.viewName,
+          "index.Address.District": el.Банк.Адрес.район.viewName,
+          "index.Address.City": getCity(el.Банк.Адрес),
+          "index.Address.Street": el.Банк.Адрес.улица.viewName,
+          "index.Address.House": el.Банк.Адрес.дом.viewName,
+          "index.Address.Corps": el.Банк.Адрес.корпус,
+          "index.Address.Office": el.Банк.Адрес.квартира,
+          "index.Address.ZipCode": el.Банк.Адрес.индекс,
+        }
+      )),
+      Кредиторы: data.Кредиторы.reduce((result, el) => {
+        if (el.СодержаниеОбязательства === 'налог') {
+          return result
+        }
+        if (!result[el.Кредитор.Наименование]) {
+          result[el.Кредитор.Наименование] = [];
+        }
+        result[el.Кредитор.Наименование].push(
+          {
+            "PersonType": "Коммерческая организация",
+            "INN": el.Кредитор.ИНН,
+            "FIO": el.Кредитор.Наименование,
+            "LiabilitiesSum.index.ContentLiabilities": el.СодержаниеОбязательства,
+            "LiabilitiesSum.index.BasisOfOrigin": el.ОснованиеВозникновения,
+            "LiabilitiesSum.index.Sum": String(el.СуммаВсего),
+            "LiabilitiesSum.index.Debt": String(el.СуммаЗадолженность),
+            "LiabilitiesSum.index.Fine": String(el.ШтрафыПени),
+            "Address.Country": 'Российская Федерация',
+            "Address.Region": el.Кредитор.Адрес.регион.viewName,
+            "Address.District": el.Кредитор.Адрес.район.viewName,
+            "Address.City": getCity(el.Кредитор.Адрес),
+            "Address.Street": el.Кредитор.Адрес.улица.viewName,
+            "Address.House": el.Кредитор.Адрес.дом.viewName,
+            "Address.Corps": el.Кредитор.Адрес.корпус,
+            "Address.Office": el.Кредитор.Адрес.квартира,
+            "Address.ZipCode": el.Кредитор.Адрес.индекс,
+          }
+        );
+        return result
+      }, {})
+    };
+    exportData.БанковскиеСчета = Object.fromEntries(exportData.БанковскиеСчета.map((el,i)=>([i,el])));
+    exportData.НедвижимоеИмущество = Object.fromEntries(exportData.НедвижимоеИмущество.map((el,i)=>([i,el])));
+    exportData.ДвижимоеИмущество = Object.fromEntries(exportData.ДвижимоеИмущество.map((el,i)=>([i,el])));
+    Object.keys(exportData.Кредиторы).map(key => {
+      exportData.Кредиторы[key] = Object.fromEntries(exportData.Кредиторы[key].map((el,i)=>([i,el])))
+    });
+    return exportData;
   }
+
+  const handleExport = () => {
+
+    const a = document.createElement("a");
+    const file = new Blob([JSON.stringify(getExportData())], { type: 'application/json' });
+    a.href = URL.createObjectURL(file);
+    a.download = `${data.Фамилия}.json`;
+    a.click();
+  }
+
+  return (
+    <TabContext.Provider value={{ ...tabContext, sourceTabId }}>
+      <div className={classes.buttonGroup}>
+        <StandardEditButtons
+          tabId={tabId}
+          refetchHandler={() => refetch()}
+          setSaving={setSaving}
+          api="api/clients"
+        />
+        <PrintButton options={printOptions} />
+        <ExtendableButton
+          variant="contained"
+          startIcon={<ImportExport color="primary" />}
+          onClick={handleExport}
+        >
+          <Typography variant="body2">Выгрузить в Arbitr.ru</Typography>
+        </ExtendableButton>
+      </div>
+      {(saving || loading || loadingAttachments) && <LinearProgress />}
+      {(attachmentSection && data) &&
+        <EditForm
+          layout={layout} />
+      }
+
+    </TabContext.Provider>
+  )
 
 }
 

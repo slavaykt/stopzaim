@@ -2,21 +2,45 @@ import React, { useContext, useEffect, useState } from 'react';
 import useAxios from "axios-hooks";
 import EditForm from './EditForm';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeCollectionData, changeData, handleRegister, setLayout } from '../../redux/actions/actions';
+import { changeData, deleteRecord, loadData, refetchTab, setError } from '../../redux/actions/actions';
 import { TabContext } from '../context';
 import axios from 'axios';
 import { useRegisterHandler } from '../../hooks/register.handlers.hook';
+import { LinearProgress, makeStyles, Typography } from '@material-ui/core';
+import StandardEditButtons from './StandardEditButtons';
+import ExtendableButton from './ExtendableButton';
+import { Cancel, CheckCircle, Print } from '@material-ui/icons';
+import DropDownButton from './DropDownButton';
+import PrintButton from './PrintButton';
 
+const useStyles = makeStyles((theme) => ({
+  buttonGroup: {
+    '& > *': {
+      margin: theme.spacing(1),
+    },
+  },
+}));
 
 const ContractEdit = () => {
 
   const dispatch = useDispatch();
   const tabContext = useContext(TabContext);
   const { tabId } = tabContext;
-  const { data, sourceTabId } = useSelector(state => state.app.getTab(tabId));
+  const { data, sourceTabId, api: tabApi } = useSelector(state => state.app.getTab(tabId));
   const enumerations = useSelector(state => state.config.enumerations);
+  const sourceTab = useSelector(state => state.app.getTab(sourceTabId));
+  const [{ data: fetchedData, loading, error: fetchError }, refetch] = useAxios(tabApi, { useCache: false });
+  const [saving, setSaving] = useState(false);
+  const classes = useStyles();
   const { contractRegisterHandler } = useRegisterHandler();
-  const baseApi = '/api/contracts';
+
+  useEffect(() => {
+    if (fetchedData) {
+      dispatch(loadData(tabId, fetchedData));
+    }
+  }, [fetchedData]);
+
+
   const [layout, setLayout] = useState(
     [
       {
@@ -93,16 +117,25 @@ const ContractEdit = () => {
         { label: 'Договор', url: `/print/contract/${data.id}` },
       ];
 
-  const requiredForRegister = ['Клиент'];    
-
   return (
     <TabContext.Provider value={{ ...tabContext, sourceTabId }}>
-      <EditForm
-        layout={layout}
-        printOptions={printOptions}
-        registerHandler={contractRegisterHandler}
-        requiredForRegister={requiredForRegister}
-        api={baseApi} />
+      <div className={classes.buttonGroup}>
+        <StandardEditButtons
+          tabId={tabId}
+          refetchHandler={() => refetch()}
+          setSaving={setSaving}
+          api="api/contracts"
+          displayRegister={true}
+          requiredToRegister={['Клиент']}
+          registerHandler={contractRegisterHandler}
+        />
+        <PrintButton options={printOptions} />
+      </div>
+      {(saving || loading) && <LinearProgress />}
+      {data &&
+        <EditForm
+          layout={layout} />
+      }
     </TabContext.Provider>
   )
 

@@ -2,20 +2,41 @@ import React, { useContext, useEffect, useState } from 'react';
 import useAxios from "axios-hooks";
 import EditForm from './EditForm';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeCollectionData, changeData, handleRegister, register, setLayout } from '../../redux/actions/actions';
+import { changeData, deleteRecord, loadData, refetchTab, setError } from '../../redux/actions/actions';
 import { TabContext } from '../context';
 import axios from 'axios';
 import { useRegisterHandler } from '../../hooks/register.handlers.hook';
+import { LinearProgress, makeStyles, Typography } from '@material-ui/core';
+import StandardEditButtons from './StandardEditButtons';
+import ExtendableButton from './ExtendableButton';
+import { Cancel, CheckCircle } from '@material-ui/icons';
+
+const useStyles = makeStyles((theme) => ({
+  buttonGroup: {
+    '& > *': {
+      margin: theme.spacing(1),
+    },
+  },
+}));
 
 const CashIncomeEdit = () => {
 
   const dispatch = useDispatch();
   const tabContext = useContext(TabContext);
   const { tabId } = tabContext;
-  const { data, sourceTabId } = useSelector(state => state.app.getTab(tabId));
+  const { data, sourceTabId, api: tabApi } = useSelector(state => state.app.getTab(tabId));
   const enumerations = useSelector(state => state.config.enumerations);
-  const baseApi = '/api/cash/orders/income';
+  const sourceTab = useSelector(state => state.app.getTab(sourceTabId));
+  const [{ data: fetchedData, loading, error: fetchError }, refetch] = useAxios(tabApi, { useCache: false });
+  const [saving, setSaving] = useState(false);
+  const classes = useStyles();
   const { cashIncomeRegisterHandler } = useRegisterHandler();
+
+  useEffect(() => {
+    if (fetchedData) {
+      dispatch(loadData(tabId, fetchedData));
+    }
+  }, [fetchedData]);
 
   const [layout, setLayout] = useState(
     [
@@ -90,15 +111,24 @@ const CashIncomeEdit = () => {
     ]
   );
 
-  const printOptions = [];
-
   return (
     <TabContext.Provider value={{ ...tabContext, sourceTabId }}>
-      <EditForm
-        layout={layout}
-        printOptions={printOptions}
-        registerHandler={cashIncomeRegisterHandler}
-        api={baseApi} />
+      <div className={classes.buttonGroup}>
+        <StandardEditButtons
+          tabId={tabId}
+          refetchHandler={() => refetch()}
+          setSaving={setSaving}
+          api="api/cash/orders/income"
+          displayRegister={true}
+          requiredToRegister={[]}
+          registerHandler={cashIncomeRegisterHandler}
+        />
+      </div>
+      {(saving || loading) && <LinearProgress />}
+      {data &&
+        <EditForm
+          layout={layout} />
+      }
     </TabContext.Provider>
   )
 

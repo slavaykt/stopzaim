@@ -23,7 +23,7 @@ class ClientAuto extends Model
     'ГодВыпуска' => '',
     'ИдентификационныйНомер' => '',
     'СведенияОЗалоге' => '',
-    'Адрес' => ''
+    'АдресOld' => ''
   ];
 
   public function getTypeAttribute()
@@ -39,5 +39,10 @@ class ClientAuto extends Model
   public function deals()
   {
     return $this->morphMany(ClientDeal::class, 'dealable');
+  }
+
+  public function address()
+  {
+    return $this->morphOne(Address::class, 'registerable');
   }
 }

@@ -15,7 +15,7 @@ class ClientBankAccountResource extends JsonResource
           'ВидСчета' => $this->ВидСчета,
           'ВалютаСчета' => $this->ВалютаСчета,
           'НомерСчета' => $this->НомерСчета,
-          'Банк' => $this->bank,
+          'Банк' => new CompanyResource($this->bank), 
           'Остаток' => $this->Остаток,
           'ДатаОткрытия' => $this->ДатаОткрытия,
         ];

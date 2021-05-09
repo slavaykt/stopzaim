@@ -7,7 +7,6 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { useDispatch, useSelector } from 'react-redux';
 import { TabContext } from '../context';
-import { useWindowSize } from '../../hooks/window.size.hook';
 import { addCollectionRow, changeCollectionData } from '../../redux/actions/actions';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
@@ -18,6 +17,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
+import views from '../views/views';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -79,7 +79,14 @@ const EditCollectionAccordion = ({ collection, header, fields }) => {
     dispatch(addCollectionRow(tabId, collection, { ...schema }));
   }
 
-  console.log(collection, header, fields);
+  const renderModalComponent = (componentName, rowIndex, modalData) => {
+    const Component = views[componentName];
+    return (
+      <div className="py-1">
+        <Component data={modalData} collection={collection} index={rowIndex}/>
+      </div>
+    )
+  }
 
   const handleChange = (rowIndex, onChangeHandler) => (e) => {
     console.log(e.target.name, e.target.value);
@@ -105,7 +112,7 @@ const EditCollectionAccordion = ({ collection, header, fields }) => {
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
           >
-            <Typography className={classes.heading}>{row[header]||'Новый объект'}</Typography>
+            <Typography className={classes.heading}>{row[header] || 'Новый объект'}</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Grid container spacing={1} className={classes.fields}>
@@ -160,6 +167,10 @@ const EditCollectionAccordion = ({ collection, header, fields }) => {
                         }
                       </Select>
                     </FormControl>
+                  }
+                  {
+                    field.type === 'modalComponent' &&
+                    renderModalComponent(field.componentName, rowIndex, row[field.key] || {})
                   }
                 </Grid>
               )}

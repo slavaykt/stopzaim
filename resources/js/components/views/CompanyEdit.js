@@ -2,17 +2,37 @@ import React, { useContext, useEffect, useState } from 'react';
 import useAxios from "axios-hooks";
 import EditForm from './EditForm';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeCollectionData, setLayout } from '../../redux/actions/actions';
+import { changeCollectionData, changeData, deleteRecord, loadData, refetchTab, setLayout } from '../../redux/actions/actions';
 import { TabContext } from '../context';
+import { LinearProgress, makeStyles } from '@material-ui/core';
+import StandardEditButtons from './StandardEditButtons';
+import axios from 'axios';
+
+const useStyles = makeStyles((theme) => ({
+  buttonGroup: {
+    '& > *': {
+      margin: theme.spacing(1),
+    },
+  },
+}));
 
 const CompanyEdit = () => {
 
   const dispatch = useDispatch();
   const tabContext = useContext(TabContext);
   const { tabId } = tabContext;
-  const { data, sourceTabId } = useSelector(state => state.app.getTab(tabId));
   const enumerations = useSelector(state => state.config.enumerations);
   const [layout, setLayout] = useState([]);
+  const { data, sourceTabId, api: tabApi } = useSelector(state => state.app.getTab(tabId));
+  const [{ data: fetchedData, loading, error: fetchError }, refetch] = useAxios(tabApi, { useCache: false });
+  const [saving, setSaving] = useState(false);
+  const classes = useStyles();
+
+  useEffect(() => {
+    if (fetchedData) {
+      dispatch(loadData(tabId, fetchedData));
+    }
+  }, [fetchedData]);
 
   useEffect(() => {
     setLayout([
@@ -61,14 +81,23 @@ const CompanyEdit = () => {
     ])
   }, []);
 
-  const printOptions = [];
-
   return (
-    <TabContext.Provider value={{...tabContext, sourceTabId }}>
-      <EditForm
-        layout={layout}
-        printOptions={printOptions}
-        api="api/companies" />
+    <TabContext.Provider value={{ ...tabContext, sourceTabId }}>
+      <div className={classes.buttonGroup}>
+        <StandardEditButtons
+          tabId={tabId}
+          refetchHandler={() => refetch()}
+          setSaving={setSaving}
+          api="api/companies"
+        />
+      </div>
+      {(saving || loading) && <LinearProgress />}
+      {data &&
+        <EditForm
+          layout={layout}
+          api="api/clients" />
+      }
+
     </TabContext.Provider>
   )
 }

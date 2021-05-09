@@ -1,4 +1,4 @@
-import { ADD_TAB, CLOSE_TAB, SET_ACTIVE_TAB, CHANGE_DATA, CHANGE_FOLDER, DELETE_ROW, ADD_ROW, CHANGE_COLLECTION_DATA, ADD_COLLECTION_ROW, DELETE_COLLECTION_ROW, REORDER_TABLE, SET_ACTIVE_ROW, INSERT_COLLECTION_ROW, REFETCH_TAB, SET_DRAWER_OPEN, LOAD_DATA, CHANGE_INDEX_DATA } from './../actions/ActionTypes';
+import { ADD_TAB, CLOSE_TAB, SET_ACTIVE_TAB, CHANGE_DATA, CHANGE_FOLDER, DELETE_ROW, ADD_ROW, CHANGE_COLLECTION_DATA, ADD_COLLECTION_ROW, DELETE_COLLECTION_ROW, REORDER_TABLE, SET_ACTIVE_ROW, INSERT_COLLECTION_ROW, REFETCH_TAB, SET_DRAWER_OPEN, LOAD_DATA, CHANGE_INDEX_DATA, SET_ERROR } from './../actions/ActionTypes';
 
 const initialState = {
   activeTab: -1,
@@ -70,7 +70,7 @@ export const appReducer = (state = initialState, action) => {
       tabs[tabIndex].data[action.collection].splice(action.rowIndex, 0, action.row);
       return { ...state, tabs };
     case DELETE_COLLECTION_ROW:
-      tabs[tabIndex].data[action.collection][action.rowIndex].delete = true;
+      tabs[tabIndex].data[action.collection].splice(action.rowIndex,1);
       return { ...state, tabs };
     case CHANGE_FOLDER:
       tabs[tabIndex].data.forEach(row => {
@@ -108,7 +108,9 @@ export const appReducer = (state = initialState, action) => {
 
       });
       return { ...state, tabs };
+    case SET_ERROR:
+      tabs[tabIndex].error = action.error;
+      return { ...state, tabs };
     default: return state
-
   }
 }

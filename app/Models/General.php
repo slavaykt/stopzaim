@@ -37,7 +37,7 @@ class General extends Model
       return $this->dateFormat($val);
     } else {
       return $val;
-    }  
+    }
   }
 
   protected static function boot()
@@ -56,29 +56,59 @@ class General extends Model
         }
         if (!isset($model->collections)) return;
         foreach ($model->collections as $name => $collection) {
-          if (!isset($request[$name])) return;
-          $idsToDelete = array_diff(array_pluck($model->$collection->toArray(), 'id'), array_pluck($request[$name], 'id'));
-          foreach ($idsToDelete as $id) {
-            $model->$collection()->where('id', $id)->delete();
+          if (!isset($request[$name])) continue;
+          if ($name === 'Сделки') {
+            logger($model->$collection->toArray());
+            logger($request[$name]);
           }
+          $idsToDelete = array_diff(array_pluck($model->$collection->toArray(), 'id'), array_pluck($request[$name], 'id'));
+          $model->$collection()->whereIn('id', $idsToDelete)->delete();
           foreach ($request[$name] as $item) {
             $payload = [];
-            foreach ($item as $key => $val) {
-              if (isset($val['id'])) {
-                $payload[$key] = $val['id'];
-                continue;
+            try {
+              $schema = $model->$collection()->firstOrNew(['id' =>  0]);
+              foreach ($schema->toArray() as $key => $value) {
+                if (!isset($item[$key])) continue;
+                $payload[$key] = isset($item[$key]['id']) ? $item[$key]['id'] : $item[$key];
               }
-              preg_match_all('/^.+?:.+?(?=\|)|(?<=\|).+?:.+(?=\|)|(?<=\|).+?$/', $val, $matches);
-              if (count($matches[0]) > 0) {
-                foreach ($matches[0] as $match) {
-                  [$k, $v] = explode(":", $match);
-                  $payload[$k] = $v;
+              // if (isset($item['Имущество'])) {
+              //   preg_match_all('/^.+?:.+?(?=\|)|(?<=\|).+?:.+(?=\|)|(?<=\|).+?$/',$item['Имущество'], $matches);
+              //   if (count($matches[0]) > 0) {
+              //     foreach ($matches[0] as $match) {
+              //       [$k, $v] = explode(":", $match);
+              //       $payload[$k] = $v;
+              //     }
+              //   }
+              // }
+              $row = $model->$collection()->firstOrNew(['id' =>  $payload['id']]);
+              $row->fill(array_except($payload, ['id']));
+              $row->save();
+              if (isset($item['Адрес'])) {
+                $transformed_address = transform_address($item['Адрес']);
+                
+                $row->address()->updateOrCreate(array_only($transformed_address, ['id']), array_except($transformed_address, ['id']));
+              }
+              if ($name === 'Сделки' && isset($item['Имущество'])) {
+                $arr = explode("|", $item['Имущество']);
+                $d_type = null;
+                $d_id = null;
+                foreach ($arr as $value) {
+                  [$k, $v] = explode(":", $value);
+                  if ($k === 'dealable_type') {
+                    $d_type = $v;
+                  } else if ($k === 'dealable_id') {
+                    $d_id = $v;
+                  }
                 }
-                continue;
+                if (isset($d_type) && isset($d_id)) {
+                  $dealable = $d_type::find($d_id);
+                  $row->dealable()->associate($dealable);
+                  $row->save();
+                }
               }
-              $payload[$key] = $val;
+            } catch (\Throwable $th) {
+              logger($th->getMessage());
             }
-            $model->$collection()->updateOrCreate(array_only($payload, ['id']), array_except($payload, ['id']));
           }
         }
       });

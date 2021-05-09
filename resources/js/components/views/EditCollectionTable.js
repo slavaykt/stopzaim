@@ -76,7 +76,7 @@ const EditCollectionTable = ({ columns, collection }) => {
   const bottomRef = useRef(null);
 
   useEffect(()=>{
-    scrollToBottom();
+    // scrollToBottom();
   });
 
   const handleChange = (rowIndex, onChangeHandler, isRelationship = false) => (e) => {
@@ -104,8 +104,6 @@ const EditCollectionTable = ({ columns, collection }) => {
 
   const handleDeleteRow = () => {
 
-    console.log('activeRow', activeRow);
-    console.log('data.length-1', data.length - 1);
     dispatch(deleteCollectionRow(tabId, collection, activeRow));
     if (activeRow === data.length) {
       setActiveRow(activeRow - 1)
@@ -150,8 +148,7 @@ const EditCollectionTable = ({ columns, collection }) => {
     }
   }
 
-  const renderTableRow = (row, rowIndex, isLastRow) => {
-    if (row.delete) return false;
+  const renderTableRow = (row, rowIndex) => {
     return (
       <TableRow
         key={rowIndex}
