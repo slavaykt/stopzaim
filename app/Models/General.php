@@ -57,10 +57,6 @@ class General extends Model
         if (!isset($model->collections)) return;
         foreach ($model->collections as $name => $collection) {
           if (!isset($request[$name])) continue;
-          if ($name === 'Сделки') {
-            logger($model->$collection->toArray());
-            logger($request[$name]);
-          }
           $idsToDelete = array_diff(array_pluck($model->$collection->toArray(), 'id'), array_pluck($request[$name], 'id'));
           $model->$collection()->whereIn('id', $idsToDelete)->delete();
           foreach ($request[$name] as $item) {

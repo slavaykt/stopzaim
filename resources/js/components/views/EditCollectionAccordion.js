@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { useDispatch, useSelector } from 'react-redux';
 import { TabContext } from '../context';
-import { addCollectionRow, changeCollectionData } from '../../redux/actions/actions';
+import { addCollectionRow, changeCollectionData, deleteCollectionRow, insertCollectionRow } from '../../redux/actions/actions';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
@@ -18,6 +18,8 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 import views from '../views/views';
+import ExtendableButton from './ExtendableButton';
+import { Delete, FileCopy } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -50,24 +52,6 @@ const Accordion = withStyles({
   },
 })(MuiAccordion);
 
-const CustomButton = withStyles((theme) => ({
-  root: {
-    paddingRight: 8,
-    '& p': {
-      transition: theme.transitions.create(["display"], {
-        duration: theme.transitions.duration.complex,
-      }),
-      display: 'none'
-    },
-    '&:hover p': {
-      display: 'inline'
-    },
-    '&:focus ': {
-      outline: 'none'
-    },
-  },
-}))(Button);
-
 const EditCollectionAccordion = ({ collection, header, fields }) => {
   const dispatch = useDispatch();
   const { tabId } = useContext(TabContext);
@@ -83,7 +67,7 @@ const EditCollectionAccordion = ({ collection, header, fields }) => {
     const Component = views[componentName];
     return (
       <div className="py-1">
-        <Component data={modalData} collection={collection} index={rowIndex}/>
+        <Component data={modalData} collection={collection} index={rowIndex} />
       </div>
     )
   }
@@ -96,16 +80,24 @@ const EditCollectionAccordion = ({ collection, header, fields }) => {
     }
   }
 
+  const handleDeleteRow = (rowIndex) => {
+    dispatch(deleteCollectionRow(tabId, collection, rowIndex));
+  }
+
+  const handleCopy = (rowIndex) => {
+    dispatch(insertCollectionRow(tabId, collection, { ...data[rowIndex], id: null }, rowIndex));
+  }
+
   return (
     <div className={classes.root}>
       <div className={classes.buttonGroup}>
-        <CustomButton
+        <ExtendableButton
           variant="contained"
           startIcon={<AddCircleIcon color="primary" />}
           onClick={handleAddRow}
         >
-          <Typography variant="body2">Добавить строку</Typography>
-        </CustomButton>
+          <Typography variant="body2">Добавить</Typography>
+        </ExtendableButton>
       </div>
       {data.map((row, rowIndex) =>
         <Accordion key={`${collection}+${rowIndex}`} className={classes.accordion}>
@@ -174,6 +166,24 @@ const EditCollectionAccordion = ({ collection, header, fields }) => {
                   }
                 </Grid>
               )}
+              <Grid item xs={12}>
+                <div className={classes.buttonGroup}>
+                  <ExtendableButton
+                    variant="contained"
+                    startIcon={<Delete color="primary" />}
+                    onClick={() => handleDeleteRow(rowIndex)}
+                  >
+                    <Typography variant="body2">Удалить</Typography>
+                  </ExtendableButton>
+                  <ExtendableButton
+                    variant="contained"
+                    startIcon={<FileCopy color="primary" />}
+                    onClick={() => handleCopy(rowIndex)}
+                  >
+                    <Typography variant="body2">Скопировать</Typography>
+                  </ExtendableButton>
+                </div>
+              </Grid>
             </Grid>
           </AccordionDetails>
         </Accordion>
