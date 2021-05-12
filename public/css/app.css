@@ -10938,6 +10938,16 @@ a.text-dark:focus {
   padding: 4rem;
 }
 
+.printComponent {
+  display: none;
+}
+
+@media print {
+  .printForm {
+    display: block !important;
+  }
+}
+
 /* Устанавливаем свой шрифт для выпадающего списка*/
 
 #kladr_autocomplete a,

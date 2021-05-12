@@ -1,15 +1,17 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { Component, useContext, useEffect, useRef, useState } from 'react';
 import useAxios from "axios-hooks";
 import EditForm from './EditForm';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeData, deleteRecord, loadData, refetchTab, setError } from '../../redux/actions/actions';
+import { changeData, loadData } from '../../redux/actions/actions';
 import { TabContext } from '../context';
-import axios from 'axios';
 import { useRegisterHandler } from '../../hooks/register.handlers.hook';
-import { LinearProgress, makeStyles, Typography } from '@material-ui/core';
+import { Divider, Grid, LinearProgress, makeStyles, Typography } from '@material-ui/core';
 import StandardEditButtons from './StandardEditButtons';
 import ExtendableButton from './ExtendableButton';
-import { Cancel, CheckCircle } from '@material-ui/icons';
+import { Print } from '@material-ui/icons';
+import { useReactToPrint } from 'react-to-print';
+import classNames from 'classnames/bind';
+import CashIncomePrintForm from '../printForms/CashIncomePrintForm';
 
 const useStyles = makeStyles((theme) => ({
   buttonGroup: {
@@ -31,6 +33,7 @@ const CashIncomeEdit = () => {
   const [saving, setSaving] = useState(false);
   const classes = useStyles();
   const { cashIncomeRegisterHandler } = useRegisterHandler();
+  const componentRef = useRef();
 
   useEffect(() => {
     if (fetchedData) {
@@ -111,6 +114,11 @@ const CashIncomeEdit = () => {
     ]
   );
 
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+    bodyClass: "printWindow",
+  });
+
   return (
     <TabContext.Provider value={{ ...tabContext, sourceTabId }}>
       <div className={classes.buttonGroup}>
@@ -123,12 +131,24 @@ const CashIncomeEdit = () => {
           requiredToRegister={[]}
           registerHandler={cashIncomeRegisterHandler}
         />
+        <ExtendableButton
+          variant="contained"
+          startIcon={<Print color="primary" />}
+          onClick={handlePrint}
+        >
+          <Typography variant="body2">Печать</Typography>
+        </ExtendableButton>
       </div>
       {(saving || loading) && <LinearProgress />}
       {data &&
         <EditForm
           layout={layout} />
       }
+      <div style={{ display: "none" }}>
+        {data &&
+          <CashIncomePrintForm ref={componentRef} data={data} />
+        }
+      </div>
     </TabContext.Provider>
   )
 

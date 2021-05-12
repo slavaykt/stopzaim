@@ -8,5 +8,11 @@ export const useDateFormat = () => {
     return d.toLocaleDateString();
   }, [])
 
-  return { localeDate }
+  const localeDateFullMonth = useCallback((value) => {
+    let d = new Date();
+    d.setTime(Date.parse(value));
+    return d.toLocaleDateString('ru-RU',{day:"numeric",month:"long",year:"numeric"});
+  }, [])
+
+  return { localeDate, localeDateFullMonth }
 }

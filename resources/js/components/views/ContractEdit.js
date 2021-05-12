@@ -40,6 +40,7 @@ const ContractEdit = () => {
     }
   }, [fetchedData]);
 
+  console.log(data);
 
   const [layout, setLayout] = useState(
     [

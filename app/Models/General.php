@@ -62,11 +62,13 @@ class General extends Model
           foreach ($request[$name] as $item) {
             $payload = [];
             try {
-              $schema = $model->$collection()->firstOrNew(['id' =>  0]);
-              foreach ($schema->toArray() as $key => $value) {
-                if (!isset($item[$key])) continue;
-                $payload[$key] = isset($item[$key]['id']) ? $item[$key]['id'] : $item[$key];
+              $row = $model->$collection()->firstOrNew(['id' =>  $item['id']]);
+              foreach ($row->getAttributes() as $key => $value) {
+                if (isset($item[$key]) && $key !== 'id') {
+                  $row->$key = $item[$key];
+                }
               }
+              $row->save();
               // if (isset($item['Имущество'])) {
               //   preg_match_all('/^.+?:.+?(?=\|)|(?<=\|).+?:.+(?=\|)|(?<=\|).+?$/',$item['Имущество'], $matches);
               //   if (count($matches[0]) > 0) {
@@ -76,12 +78,10 @@ class General extends Model
               //     }
               //   }
               // }
-              $row = $model->$collection()->firstOrNew(['id' =>  $payload['id']]);
-              $row->fill(array_except($payload, ['id']));
-              $row->save();
+              // $row->save();
               if (isset($item['Адрес'])) {
                 $transformed_address = transform_address($item['Адрес']);
-                
+
                 $row->address()->updateOrCreate(array_only($transformed_address, ['id']), array_except($transformed_address, ['id']));
               }
               if ($name === 'Сделки' && isset($item['Имущество'])) {
