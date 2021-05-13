@@ -26,7 +26,6 @@ function StandardEditButtons({ tabId, refetchHandler, setSaving, api, displayReg
       }
       if (isRefetch) {
         dispatch(refetchTab(sourceTab));
-        //refetchHandler();
       }
       setSaving(false);
     }
@@ -59,10 +58,12 @@ function StandardEditButtons({ tabId, refetchHandler, setSaving, api, displayReg
     }
     await handleSubmit(false)
     const method = isRegister ? 'updateOrCreate' : 'delete';
-    await registerHandler(method, [data], 'edit');
-    dispatch(refetchTab(sourceTab));
-    //refetchHandler();
-    setSaving(false);
+    const status = await registerHandler(method, [data], 'edit');
+    if (status===201) {
+      dispatch(refetchTab(sourceTab));
+      dispatch(changeData(tabId, 'registered', isRegister));
+    }
+    setSaving(false);  
   }
 
   return (
