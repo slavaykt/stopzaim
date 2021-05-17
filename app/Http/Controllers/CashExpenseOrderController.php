@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CashExpenseOrderRequest;
 use App\Http\Resources\CashExpenseOrderResource;
 use App\Models\CashExpenseOrder;
 use Illuminate\Http\Request;
@@ -21,7 +20,7 @@ class CashExpenseOrderController extends Controller
       return response()->json($response, 200);
     }
 
-    public function store(CashExpenseOrderRequest $request)
+    public function store(Request $request)
     {
       try {
         $cashExpenseOrder = CashExpenseOrder::create($request->all());      
@@ -49,7 +48,7 @@ class CashExpenseOrderController extends Controller
       }
     }
 
-    public function update(CashExpenseOrderRequest $request, CashExpenseOrder $cashExpenseOrder)
+    public function update(Request $request, CashExpenseOrder $cashExpenseOrder)
     {
       try {
         $cashExpenseOrder->update($request->all());

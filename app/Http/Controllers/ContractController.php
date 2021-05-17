@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ContractRequest;
 use App\Http\Resources\ContractResource;
 use App\Models\Contract;
 use Carbon\Carbon;
@@ -21,7 +20,7 @@ class ContractController extends Controller
     return response()->json(new ContractResource(new Contract), 200);
   }
 
-  public function store(ContractRequest $request)
+  public function store(Request $request)
   {
     try {
       $contract = Contract::create($request->all());
@@ -51,7 +50,7 @@ class ContractController extends Controller
     }
   }
 
-  public function update(ContractRequest $request, Contract $contract)
+  public function update(Request $request, Contract $contract)
   {
     try {
       $contract->update($request->all());

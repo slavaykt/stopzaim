@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CashIncomeOrderRequest;
 use App\Http\Resources\CashIncomeOrderResource;
 use App\Models\CashExpenseOrder;
 use App\Models\CashIncomeOrder;
@@ -23,7 +22,7 @@ class CashIncomeOrderController extends Controller
     return response()->json($response, 200);
   }
 
-  public function store(CashIncomeOrderRequest $request)
+  public function store(Request $request)
   {
     try {
       $cashIncomeOrder = CashIncomeOrder::create($request->all());
@@ -51,7 +50,7 @@ class CashIncomeOrderController extends Controller
     }
   }
 
-  public function update(CashIncomeOrderRequest $request, CashIncomeOrder $cashIncomeOrder)
+  public function update(Request $request, CashIncomeOrder $cashIncomeOrder)
   {
     try {
       $cashIncomeOrder->update($request->all());
