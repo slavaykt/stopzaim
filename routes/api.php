@@ -47,6 +47,8 @@ Route::resource('cash/orders/income', CashIncomeOrderController::class)->paramet
   'income' => 'cash_income_order'
 ]);
 
+Route::get('cash/orders/income/dateTime/{date}', [CashIncomeOrerController::class, 'dateTime']);
+
 Route::resource('cash/orders/expense', CashExpenseOrderController::class)->parameters([
   'expense' => 'cash_expense_order'
 ]);

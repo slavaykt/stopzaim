@@ -69,7 +69,18 @@ class CompanyController extends Controller
 
   public function destroy($ids)
   {
-    Company::destroy(explode(",", $ids));
-    return response()->json(null, 204);
+    $idsArr = explode(",", $ids);
+    $errors = [];
+    foreach ($idsArr as $id) {
+      $company = Company::find($id);
+      if (isset($company)) {
+        if (count($company->links) > 0) {
+          $errors = array_merge($errors, $company->links);
+        } else {
+          Company::destroy($id);
+        }
+      }
+    }
+    return response()->json($errors, 200);
   }
 }

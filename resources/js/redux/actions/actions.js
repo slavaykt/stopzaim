@@ -173,6 +173,8 @@ export const addRow = (tabId, api, row) => {
 export const deleteRecord = (tabId, api, id) => {
   return async dispatch => {
     const response = await Axios.delete(api + '/' + id)
+    const resData = await response.data;
+    console.log("response data",resData);
     if (response.status === 204) {
       dispatch(
         {

@@ -165,7 +165,7 @@ const EditCollectionTable = ({ columns, collection }) => {
                     className={classes.tableInput}
                     fullWidth
                     type={column.type}
-                    value={row[column.key]}
+                    value={row[column.key]||""}
                     onChange={handleChange(rowIndex, column.onChangeHandler)}
                   />
                 </FormControl>

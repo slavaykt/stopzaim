@@ -166,4 +166,32 @@ class Client extends General
     return $this->Фамилия . " " . mb_substr($this->Имя, 0, 1) . "." . mb_substr($this->Отчество, 0, 1) . ".";
   }
 
+  public function cashIncomes()
+  {
+    return $this->hasMany(CashIncomeOrder::class, 'Клиент');
+  }
+
+  public function contracts()
+  {
+    return $this->hasMany(Contract::class, 'Клиент');
+  }
+
+  function dateFormat($dateString)
+  {
+    return date("d.m.Y", strtotime($dateString));
+  }
+
+  public function getLinksAttribute()
+  {
+    $links = [];
+    foreach ($this->cashIncomes as $link) {
+      $date = $this->dateFormat($link->Дата);
+      $links[] = ['object' => "ПКО $link->Номер от $date", 'property' => "Клиент"];
+    }
+    foreach ($this->contracts as $link) {
+      $date = $this->dateFormat($link->Дата);
+      $links[] = ['object' => "Договор $link->Номер от $date", 'property' => "Клиент"];
+    }
+    return $links;
+  }
 }

@@ -64,7 +64,14 @@ const CashExpenseEdit = () => {
         label: 'Дата',
         key: 'Дата',
         size: 4,
-        inputType: 'datetime-local'
+        inputType: 'datetime-local',
+        onChangeHandler: async (data, dateString) => {
+          const response = await axios.get(`api/cash/orders/income/dateTime/${dateString}`);
+          if (response.status === 200) {
+            const resData = await response.data;
+            dispatch(changeData(tabId, 'Дата', resData));
+          }
+        }
       },
       {
 

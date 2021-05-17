@@ -12,6 +12,7 @@ import { Print } from '@material-ui/icons';
 import { useReactToPrint } from 'react-to-print';
 import classNames from 'classnames/bind';
 import CashIncomePrintForm from '../printForms/CashIncomePrintForm';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
   buttonGroup: {
@@ -65,7 +66,14 @@ const CashIncomeEdit = () => {
         label: 'Дата',
         key: 'Дата',
         size: 4,
-        inputType: 'datetime-local'
+        inputType: 'datetime-local',
+        onChangeHandler: async (data, dateString) => {
+          const response = await axios.get(`api/cash/orders/income/dateTime/${dateString}`);
+          if (response.status === 200) {
+            const resData = await response.data;
+            dispatch(changeData(tabId, 'Дата', resData));
+          }
+        }
       },
       {
         type: 'relationship',

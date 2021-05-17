@@ -37,4 +37,9 @@ class ClientBankAccount extends Model
   {
     return $this->belongsTo(Company::class, 'Банк');
   }
+
+  public function client()
+  {
+    return $this->belongsTo(Client::class);
+  }
 }

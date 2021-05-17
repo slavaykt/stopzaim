@@ -15,7 +15,7 @@ class ClientController extends Controller
 
   public function index()
   {
-    return response(Client::orderBy('isGroup', 'desc')->orderBy('Наименование')->get(['id','isGroup', 'parent_id', 'Наименование']), 200);
+    return response(Client::orderBy('isGroup', 'desc')->orderBy('Наименование')->get(['id', 'isGroup', 'parent_id', 'Наименование']), 200);
   }
 
   public function store(ClientRequest $request)
@@ -72,7 +72,18 @@ class ClientController extends Controller
 
   public function destroy($ids)
   {
-    Client::destroy(explode(",", $ids));
-    return response()->json(null, 204);
+    $idsArr = explode(",", $ids);
+    $errors = [];
+    foreach ($idsArr as $id) {
+      $client = Client::find($id);
+      if (isset($client)) {
+        if (count($client->links) > 0) {
+          $errors = array_merge($errors, $client->links);
+        } else {
+          Client::destroy($id);
+        }
+      }
+    }
+    return response()->json($errors, 200);
   }
 }

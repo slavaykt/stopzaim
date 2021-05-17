@@ -60,7 +60,6 @@ class General extends Model
           $idsToDelete = array_diff(array_pluck($model->$collection->toArray(), 'id'), array_pluck($request[$name], 'id'));
           $model->$collection()->whereIn('id', $idsToDelete)->delete();
           foreach ($request[$name] as $item) {
-            $payload = [];
             try {
               $row = $model->$collection()->firstOrNew(['id' =>  $item['id']]);
               foreach ($row->getAttributes() as $key => $value) {
@@ -69,19 +68,8 @@ class General extends Model
                 }
               }
               $row->save();
-              // if (isset($item['Имущество'])) {
-              //   preg_match_all('/^.+?:.+?(?=\|)|(?<=\|).+?:.+(?=\|)|(?<=\|).+?$/',$item['Имущество'], $matches);
-              //   if (count($matches[0]) > 0) {
-              //     foreach ($matches[0] as $match) {
-              //       [$k, $v] = explode(":", $match);
-              //       $payload[$k] = $v;
-              //     }
-              //   }
-              // }
-              // $row->save();
               if (isset($item['Адрес'])) {
                 $transformed_address = transform_address($item['Адрес']);
-
                 $row->address()->updateOrCreate(array_only($transformed_address, ['id']), array_except($transformed_address, ['id']));
               }
               if ($name === 'Сделки' && isset($item['Имущество'])) {

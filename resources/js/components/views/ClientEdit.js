@@ -35,8 +35,6 @@ const ClientEdit = () => {
   const { localeDate } = useDateFormat();
   const classes = useStyles();
 
-  console.log(data);
-
   useEffect(() => {
     if (fetchedData) {
       dispatch(loadData(tabId, fetchedData));
@@ -736,7 +734,7 @@ const ClientEdit = () => {
       [];
 
   const getExportData = () => {
-    const getCity = (address)=> {
+    const getCity = (address) => {
       return address.регион.viewName.toLowerCase().includes('москва') ? address.регион.viewName : address.город.viewName + address.населенныйПункт.viewName;
     };
     const exportData = {
@@ -859,11 +857,11 @@ const ClientEdit = () => {
         return result
       }, {})
     };
-    exportData.БанковскиеСчета = Object.fromEntries(exportData.БанковскиеСчета.map((el,i)=>([i,el])));
-    exportData.НедвижимоеИмущество = Object.fromEntries(exportData.НедвижимоеИмущество.map((el,i)=>([i,el])));
-    exportData.ДвижимоеИмущество = Object.fromEntries(exportData.ДвижимоеИмущество.map((el,i)=>([i,el])));
+    exportData.БанковскиеСчета = Object.fromEntries(exportData.БанковскиеСчета.map((el, i) => ([i, el])));
+    exportData.НедвижимоеИмущество = Object.fromEntries(exportData.НедвижимоеИмущество.map((el, i) => ([i, el])));
+    exportData.ДвижимоеИмущество = Object.fromEntries(exportData.ДвижимоеИмущество.map((el, i) => ([i, el])));
     Object.keys(exportData.Кредиторы).map(key => {
-      exportData.Кредиторы[key] = Object.fromEntries(exportData.Кредиторы[key].map((el,i)=>([i,el])))
+      exportData.Кредиторы[key] = Object.fromEntries(exportData.Кредиторы[key].map((el, i) => ([i, el])))
     });
     return exportData;
   }
@@ -885,6 +883,7 @@ const ClientEdit = () => {
           refetchHandler={() => refetch()}
           setSaving={setSaving}
           api="api/clients"
+          deleteTitle={`Все данные клиента ${data ? data.Наименование : ""} будут полностью удалены. Вы уверены?`}
         />
         <PrintButton options={printOptions} />
         <ExtendableButton

@@ -103,7 +103,7 @@ function EditForm({ layout }) {
             type={node.inputType}
             size="small"
             fullWidth
-            value={data[node.key] || ''}
+            value={data[node.key] || " "}
             onChange={handleChange(node.onChangeHandler)}
             InputLabelProps={
               { shrink: true }
@@ -158,7 +158,7 @@ function EditForm({ layout }) {
             node={node}
             nodeIndex={nodeIndex}
             onSubmit={SelectTableOnSubmit(node)}
-            value={data[node.key]} />
+            value={data[node.key] || ""} />
         }
         {
           node.type === 'tableComponent' &&

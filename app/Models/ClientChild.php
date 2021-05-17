@@ -16,10 +16,7 @@ class ClientChild extends Model
       'client_id' => null,
       'ФИО' => '',
       'Пол' => '',
-      'ДатаРождения' => null,
-      'СвидетельствоСерия' => '',
-      'СвидетельствоНомер' => '',
-      'СвидетельствоДатаВыдачи' => '',
+      'ДатаРождения' => null
     ];
 
     public function relationships()

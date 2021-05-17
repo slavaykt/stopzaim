@@ -40,7 +40,7 @@ const PaperComponent = (props) => {
   );
 }
 
-const DialogWrapper = ({ title, children, buttons, handleClose, disableBackdropClick = true, closeIcon = false }) => {
+const DialogWrapper = ({ title, children, buttons, handleClose, disableBackdropClick = true, closeIcon = false, size = "sm" }) => {
 
   const classes = useStyles();
 
@@ -50,7 +50,7 @@ const DialogWrapper = ({ title, children, buttons, handleClose, disableBackdropC
       onClose={handleClose}
       disableBackdropClick={disableBackdropClick}
       PaperComponent={PaperComponent}
-      maxWidth="sm"
+      maxWidth={size}
       fullWidth
     >
       <DialogTitle
