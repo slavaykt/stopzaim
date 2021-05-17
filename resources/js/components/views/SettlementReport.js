@@ -143,7 +143,7 @@ const SettlementReport = () => {
           <Typography variant="body2">Печать</Typography>
         </ExtendableButton>
       </div>
-      <Container ref={componentRef}>
+      <Container maxWidth="xl" ref={componentRef}>
         <h3>Отчет по взаиморасчетам с клиентами</h3>
         <Grid container spacing={1}>
           <Grid item sm={12} lg={6} >

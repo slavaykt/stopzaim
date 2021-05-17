@@ -5,12 +5,13 @@ import VirtualIndexTable from './VirtualIndexTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { addTab, deleteRow, loadData } from '../../redux/actions/actions';
 import DropDownButton from './DropDownButton';
-import { AddCircle as AddCircleIcon, CheckBoxOutlineBlankOutlined, CheckBoxOutlined, Delete as DeleteIcon, FileCopy, LibraryAddCheckOutlined, Cancel, CheckCircle, Refresh } from '@material-ui/icons';
+import { AddCircle as AddCircleIcon, CheckBoxOutlineBlankOutlined, CheckBoxOutlined, Delete as DeleteIcon, FileCopy, LibraryAddCheckOutlined, Cancel, CheckCircle, Refresh, Done, DoneAll } from '@material-ui/icons';
 import ConfirmableButton from './ConfirmableButton';
 import { Toolbar, makeStyles, Typography } from '@material-ui/core';
 import ExtendableButton from './ExtendableButton';
 import { useRegisterHandler } from '../../hooks/register.handlers.hook';
 import useAxios from 'axios-hooks';
+import { green } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
   buttonGroup: {
@@ -40,11 +41,11 @@ const ContractIndex = () => {
 
   const columns = [
     {
-      label: <LibraryAddCheckOutlined />,
+      label: <DoneAll />,
       dataKey: 'registered',
       width: 50,
       handler: (value) => {
-        return value ? <CheckBoxOutlined /> : <CheckBoxOutlineBlankOutlined />
+        return value ? <Done style={{ color: green[800] }}/> : ""
       }
     },
     {

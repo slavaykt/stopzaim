@@ -12,6 +12,7 @@ import ExtendableButton from './ExtendableButton';
 import ConfirmableButton from './ConfirmableButton';
 import useAxios from 'axios-hooks';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import { green, red, yellow } from '@material-ui/core/colors';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -55,11 +56,11 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-const MoveToFolderIcon = ({ color }) => {
+const MoveToFolderIcon = () => {
   return (
     <>
-      <ArrowForwardIcon color={color} />
-      <FolderIcon color={color} />
+      <ArrowForwardIcon color="primary" />
+      <FolderIcon style={{ color: yellow[800] }} />
     </>
   )
 }
@@ -238,7 +239,7 @@ const NewFolderDialog = ({ parent_id, api }) => {
     <>
       <ExtendableButton
         variant="contained"
-        startIcon={<NewFolderIcon color="primary" />}
+        startIcon={<NewFolderIcon style={{ color: yellow[800] }} />}
         onClick={handleClickOpen}>
         <Typography variant="body2">Создать группу</Typography>
       </ExtendableButton>
@@ -295,7 +296,7 @@ const MoveToFolderDialog = ({ rowIds, api }) => {
       <ExtendableButton
         variant="contained"
         onClick={handleClickOpen}
-        startIcon={<MoveToFolderIcon color="primary" />}>
+        startIcon={<MoveToFolderIcon />}>
         <Typography variant="body2">Переместить в группу</Typography>
       </ExtendableButton>
       <Dialog
@@ -409,7 +410,7 @@ const IndexTable = () => {
       <div className={classes.buttonGroup}>
         <ExtendableButton
           variant="contained"
-          startIcon={<AddCircleIcon color="primary" />}
+          startIcon={<AddCircleIcon style={{ color: green[800] }} />}
           onClick={handleCreate}>
           <Typography variant="body2">Создать</Typography>
         </ExtendableButton>
@@ -417,7 +418,7 @@ const IndexTable = () => {
         <ConfirmableButton
           title="Вы уверены?"
           handler={handleDelete}
-          icon={<DeleteIcon color="primary" />}
+          icon={<DeleteIcon style={{ color: red[800] }} />}
           buttonLabel="Удалить" />
         <MoveToFolderDialog rowIds={activeRowsIds} api={api} />
         <ExtendableButton

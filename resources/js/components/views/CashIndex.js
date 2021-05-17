@@ -8,12 +8,13 @@ import VirtualIndexTable from './VirtualIndexTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { addTab, deleteRow, loadData } from '../../redux/actions/actions';
 import DropDownButton from './DropDownButton';
-import { AddCircle as AddCircleIcon, Cancel, CheckCircle, Delete as DeleteIcon, FileCopy, Refresh } from '@material-ui/icons';
+import { AddCircle as AddCircleIcon, Cancel, CheckCircle, Delete as DeleteIcon, Done, DoneAll, FileCopy, Refresh } from '@material-ui/icons';
 import ConfirmableButton from './ConfirmableButton';
 import { Toolbar, makeStyles, Typography } from '@material-ui/core';
 import ExtendableButton from './ExtendableButton';
 import { useRegisterHandler } from '../../hooks/register.handlers.hook';
 import useAxios from 'axios-hooks';
+import { green, red } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
   buttonGroup: {
@@ -42,11 +43,11 @@ const CashIndex = () => {
 
   const columns = [
     {
-      label: <LibraryAddCheckOutlinedIcon />,
+      label: <DoneAll />,
       dataKey: 'registered',
       width: 50,
       handler: (value) => {
-        return value ? <CheckBoxOutlinedIcon /> : <CheckBoxOutlineBlankOutlinedIcon />
+        return value ? <Done style={{ color: green[800] }}/> : ""
       }
     },
     {
@@ -159,7 +160,7 @@ const CashIndex = () => {
         className={classes.buttonGroup}
         variant="dense">
         <DropDownButton
-          icon={<AddCircleIcon color="primary" />}
+          icon={<AddCircleIcon style={{ color: green[800] }} />}
           buttonLabel="Создать"
           options={
             docs.map(doc => (
@@ -170,7 +171,7 @@ const CashIndex = () => {
         <ConfirmableButton
           title="Вы уверены?"
           handler={handleDelete}
-          icon={<DeleteIcon color="primary" />}
+          icon={<DeleteIcon style={{ color: red[800] }} />}
           buttonLabel="Удалить" />
         <ExtendableButton
           variant="contained"
