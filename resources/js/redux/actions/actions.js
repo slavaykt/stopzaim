@@ -1,5 +1,5 @@
 import Axios from 'axios';
-import { ADD_COLLECTION_ROW, ADD_TAB, CLOSE_TAB, ADD_ROW, CHANGE_COLLECTION_DATA, CHANGE_DATA, CHANGE_FOLDER, DELETE_COLLECTION_ROW, DELETE_ROW, INSERT_COLLECTION_ROW, LOAD_CONFIG, REORDER_TABLE, SET_ACTIVE_ROW, SET_ACTIVE_TAB, REFETCH_TAB, SET_DRAWER_OPEN, LOAD_DATA, CHANGE_INDEX_DATA, SET_ERROR } from './ActionTypes';
+import { ADD_COLLECTION_ROW, ADD_TAB, CLOSE_TAB, ADD_ROW, CHANGE_COLLECTION_DATA, CHANGE_DATA, CHANGE_FOLDER, DELETE_COLLECTION_ROW, DELETE_ROW, INSERT_COLLECTION_ROW, LOAD_CONFIG, REORDER_TABLE, SET_ACTIVE_ROW, SET_ACTIVE_TAB, REFETCH_TAB, SET_DRAWER_OPEN, LOAD_DATA, CHANGE_INDEX_DATA, SET_ERROR, CHANGE_KANBAN_STAGE } from './ActionTypes';
 import { v4 as uuidv4 } from 'uuid';
 
 export const addTab = (label, api, componentName, sourceTabId) => {
@@ -244,6 +244,15 @@ export const setError = (tabId, error) => {
     {
       type: SET_ERROR,
       tabId, error
+    }
+  )
+}
+
+export const changeKanbanStage = (tabId, id, key, value) => {
+  return (
+    {
+      type: CHANGE_KANBAN_STAGE,
+      tabId, id, key, value
     }
   )
 }

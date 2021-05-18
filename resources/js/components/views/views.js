@@ -14,5 +14,6 @@ import ContractIndex from './ContractIndex';
 import ContractEdit from './ContractEdit';
 import SettlemenTReport from './SettlemenTReport';
 import СollectingManagement from './СollectingManagement';
+import Kanban from './Kanban';
 
-export default { ClientIndex, ClientEdit, CompanyIndex, CompanyEdit, ClientAttachmentSectionSetup, PassportComponent, AddressComponent, CashIncomeIndex, CashIncomeEdit, CashExpenseIndex, CashExpenseEdit, CashIndex, ContractIndex, ContractEdit, SettlemenTReport, СollectingManagement }
+export default { ClientIndex, ClientEdit, CompanyIndex, CompanyEdit, ClientAttachmentSectionSetup, PassportComponent, AddressComponent, CashIncomeIndex, CashIncomeEdit, CashExpenseIndex, CashExpenseEdit, CashIndex, ContractIndex, ContractEdit, SettlemenTReport, СollectingManagement, Kanban }

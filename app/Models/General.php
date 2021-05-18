@@ -62,12 +62,12 @@ class General extends Model
           foreach ($request[$name] as $item) {
             try {
               $row = $model->$collection()->firstOrNew(['id' =>  $item['id']]);
-              // foreach ($row->getAttributes() as $key => $value) {
-              //   if (isset($item[$key]) && $key !== 'id') {
-              //     $row->$key = $item[$key];
-              //   }
-              // }
-              $row->fill($item);
+              foreach ($row->getAttributes() as $key => $value) {
+                if (isset($item[$key]) && $key !== 'id') {
+                  $row->$key = $item[$key];
+                }
+              }
+              //$row->fill($item);
               $row->save();
               if (isset($item['Адрес'])) {
                 $transformed_address = transform_address($item['Адрес']);

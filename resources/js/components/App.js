@@ -9,7 +9,7 @@ import React, { useLayoutEffect, useState } from 'react';
 import clsx from 'clsx';
 import { createMuiTheme, makeStyles, useTheme, ThemeProvider } from '@material-ui/core/styles';
 import { Drawer, List, CssBaseline, Divider, IconButton, ListItem, ListItemIcon, ListItemText, SvgIcon } from '@material-ui/core';
-import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon, People as PeopleIcon, Business as BusinessIcon, Settings as SettingsIcon, Equalizer as EqualizerIcon, PlaylistAddCheck } from '@material-ui/icons';
+import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon, People as PeopleIcon, Business as BusinessIcon, Settings as SettingsIcon, Equalizer as EqualizerIcon, PlaylistAddCheck, List as ListIcon, Dashboard } from '@material-ui/icons';
 import { addTab, loadConfig, setDrawerOpen } from '../redux/actions/actions';
 import { CoinIcon, ContractIcon } from './Icons';
 import 'react-virtualized/styles.css';
@@ -144,6 +144,9 @@ const App = () => {
       case 'СборДокументов':
         dispatch(addTab('Сбор документов', 'api/collectingManagement', 'СollectingManagement'));
         break;
+      case 'Канбан':
+        dispatch(addTab('Канбан', 'api/clients', 'Kanban'));
+        break;
       case 'Настройки':
         dispatch(addTab('Настройка приложений', 'api/attachment/sections', 'ClientAttachmentSectionSetup'));
         break;
@@ -206,6 +209,10 @@ const App = () => {
           <ListItem button key="СборДокументов" onClick={() => handleDrawerItemClick("СборДокументов")}>
             <ListItemIcon><PlaylistAddCheck color="primary" /></ListItemIcon>
             <ListItemText primary="Сбор документов" />
+          </ListItem>
+          <ListItem button key="Канбан" onClick={() => handleDrawerItemClick("Канбан")}>
+            <ListItemIcon><Dashboard color="primary" /></ListItemIcon>
+            <ListItemText primary="Канбан" />
           </ListItem>
           <ListItem button key="Настройки" onClick={() => handleDrawerItemClick("Настройки")}>
             <ListItemIcon><SettingsIcon color="primary" /></ListItemIcon>
