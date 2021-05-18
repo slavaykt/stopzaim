@@ -7,6 +7,7 @@ import { addTab, changeKanbanStage, loadData } from '../../redux/actions/actions
 import { TabContext } from '../context';
 import { Save } from '@material-ui/icons';
 import { green } from '@material-ui/core/colors';
+import { useWindowSize } from '../../hooks/window.size.hook';
 import axios from 'axios';
 import ExtendableButton from './ExtendableButton';
 
@@ -26,6 +27,8 @@ function Kanban(props) {
   const [{ data: fetchedData, loading, error: fetchError }, refetch] = useAxios(api, { useCache: false });
   const [saving, setSaving] = useState(false);
   const classes = useStyles();
+
+  const { tabContentSize } = useWindowSize();
 
   useEffect(() => {
     if (fetchedData) {
@@ -90,9 +93,9 @@ function Kanban(props) {
               }}
               key={stage.id}
             >
-              <div style={{ margin: 4 }}>
-                <div style={{ height: 70, background: "lightblue" }}>
-                  <Typography variant="h6" align="center">
+              <div style={{ margin: 4, width: 150 }}>
+                <div style={{ height: 45, background: "#d9e1ff" }}>
+                  <Typography variant="subtitle2" align="center">
                     {stage.label}
                   </Typography>
                 </div>
@@ -103,11 +106,12 @@ function Kanban(props) {
                       ref={provided.innerRef}
                       style={{
                         background: snapshot.isDraggingOver
-                          ? "lightblue"
-                          : "lightgrey",
+                          ? "#a0a9eb"
+                          : "#d9e1ff",
                         padding: 4,
                         width: '100%',
-                        minHeight: 1000,
+                        height: tabContentSize.height-170,
+                        overflow: 'auto'
                       }}
                     >
                       {stage.data.map((item, i) =>
@@ -119,12 +123,13 @@ function Kanban(props) {
                               {...provided.dragHandleProps}
                               style={{
                                 userSelect: "none",
-                                padding: 16,
+                                padding: 10,
                                 margin: "0 0 8px 0",
-                                minHeight: "50px",
+                                minHeight: "30px",
+                                fontSize: 12,
                                 backgroundColor: snapshot.isDragging
-                                  ? "#263B4A"
-                                  : "#456C86",
+                                  ? "#ff9800"
+                                  : "#3f51b5",
                                 color: "white",
                                 ...provided.draggableProps.style
                               }}

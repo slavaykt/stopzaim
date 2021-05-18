@@ -46,11 +46,4 @@ class ClientAuto extends Model
     return $this->morphOne(Address::class, 'registerable');
   }
 
-  // public function scopeSold($query)
-  // {
-  //   $client->autos()->where('ВидТС',$auto_type['value'])->whereHas('deals', function ($query) {
-  //     $query->where('ВидСделки', '=', 'Продажа');
-  //   })->get()
-  //   return $query->where('completed', 1);
-  // }
 }
