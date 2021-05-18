@@ -190,7 +190,7 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
         <td class="firstCell"></td>
         <td class="firstCell"></td>
       </tr>
-      @if (count($client->realties()->where('ВидИмущества',$reaty_type['value'])->get())>0)
+      @if (count($client->realties()->where('ВидИмущества',$reaty_type['value'])->whereDoesntHave('deals', function ($query) {$query->where('ВидСделки', '=', 'Продажа');})->get())>0)
       @foreach ($client->realties()->where('ВидИмущества',$reaty_type['value'])->get() as $row)
       <tr>
         <td class="innerCell"></td>
@@ -256,7 +256,7 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
         <td class="firstCell"></td>
         <td class="firstCell"></td>
       </tr>
-      @if (count($client->autos()->where('ВидТС',$auto_type['value'])->get())>0)
+      @if (count($client->autos()->where('ВидТС',$auto_type['value'])->whereDoesntHave('deals', function ($query) {$query->where('ВидСделки', '=', 'Продажа');})->get())>0)
       @foreach ($client->autos()->where('ВидТС',$auto_type['value'])->get() as $row)
       <tr>
         <td class="innerCell"></td>
