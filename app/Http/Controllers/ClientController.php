@@ -86,4 +86,18 @@ class ClientController extends Controller
     }
     return response()->json($errors, 200);
   }
+
+  public function kanbanUpdate(Request $request)
+  {
+    try {
+      foreach ($request->toArray() as $item) {
+        $client = Client::find($item['id']);
+        $client->Этап = $item['Этап'];
+        $client->save();
+      };
+      return response()->json('success', 200);
+    } catch (\Throwable $th) {
+      return response($th->getMessage(), 200);
+    } 
+  }
 }

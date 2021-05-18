@@ -43,11 +43,13 @@ Route::resources([
   'contracts' => ContractController::class,
 ]);
 
+Route::put('kanban', [ClientController::class, 'kanbanUpdate']);
+
 Route::resource('cash/orders/income', CashIncomeOrderController::class)->parameters([
   'income' => 'cash_income_order'
 ]);
 
-Route::get('cash/orders/income/dateTime/{date}', [CashIncomeOrerController::class, 'dateTime']);
+Route::get('cash/orders/income/dateTime/{date}', [CashIncomeOrderController::class, 'dateTime']);
 
 Route::resource('cash/orders/expense', CashExpenseOrderController::class)->parameters([
   'expense' => 'cash_expense_order'
