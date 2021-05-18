@@ -47,6 +47,7 @@ function StandardEditButtons({ tabId, refetchHandler, setSaving, api, displayReg
 
   const handleSubmit = async (isRefetch) => {
     setSaving(true);
+    console.log(dataToSubmit());
     const res = data.id ? await axios.put(api + '/' + String(data.id), dataToSubmit()) : await axios.post(api, dataToSubmit());
     if (res.status === 200 || res.status === 201) {
       const resData = await res.data;

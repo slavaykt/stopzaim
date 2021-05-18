@@ -16,6 +16,7 @@ class ClientDeal extends Model
   protected $attributes = [
     'id' => null,
     'client_id' => null,
+    'Дата' => null,
     'ВидСделки' => '',
     'Сумма' => 0,
     'Основание' => '',

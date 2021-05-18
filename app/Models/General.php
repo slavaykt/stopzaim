@@ -62,16 +62,11 @@ class General extends Model
           foreach ($request[$name] as $item) {
             try {
               $row = $model->$collection()->firstOrNew(['id' =>  $item['id']]);
+              $error = false;
               foreach ($row->getAttributes() as $key => $value) {
                 if (isset($item[$key]) && $key !== 'id') {
                   $row->$key = $item[$key];
                 }
-              }
-              //$row->fill($item);
-              $row->save();
-              if (isset($item['Адрес'])) {
-                $transformed_address = transform_address($item['Адрес']);
-                $row->address()->updateOrCreate(array_only($transformed_address, ['id']), array_except($transformed_address, ['id']));
               }
               if ($name === 'Сделки' && isset($item['Имущество'])) {
                 $arr = explode("|", $item['Имущество']);
@@ -88,8 +83,16 @@ class General extends Model
                 if (isset($d_type) && isset($d_id)) {
                   $dealable = $d_type::find($d_id);
                   $row->dealable()->associate($dealable);
-                  $row->save();
+                } else {
+                  $error = true;
                 }
+              }
+              if (!$error) {
+                $row->save();
+              }        
+              if (isset($item['Адрес'])) {
+                $transformed_address = transform_address($item['Адрес']);
+                $row->address()->updateOrCreate(array_only($transformed_address, ['id']), array_except($transformed_address, ['id']));
               }
             } catch (\Throwable $th) {
               logger($th->getMessage());
