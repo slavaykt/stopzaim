@@ -39,14 +39,14 @@ function Kanban(props) {
   const stages = data
     ?
     [
-      { id: 'nostage', label: 'не распределены', value: '', data: data.filter(el => el.Этап === '') },
-      { id: 'lead', label: 'потенциальный клиент', value: 'потенциальный клиент', data: data.filter(el => el.Этап === 'потенциальный клиент') },
-      { id: 'preparation', label: 'подготовка документов', value: 'подготовка документов', data: data.filter(el => el.Этап === 'подготовка документов') },
-      { id: 'applied', label: 'заявление подано', value: 'заявление подано', data: data.filter(el => el.Этап === 'заявление подано') },
-      { id: 'restructure', label: 'реструктуризация долгов', value: 'реструктуризация долгов', data: data.filter(el => el.Этап === 'реструктуризация долгов') },
-      { id: 'sale', label: 'реализация имущества', value: 'реализация имущества', data: data.filter(el => el.Этап === 'реализация имущества') },
-      { id: 'suspended', label: 'банкротство приостановлено', value: 'банкротство приостановлено', data: data.filter(el => el.Этап === 'банкротство приостановлено') },
-      { id: 'finished', label: 'банкротство завершено', value: 'банкротство окончено', data: data.filter(el => el.Этап === 'банкротство окончено') },
+      { id: 'nostage', label: 'не распределены', value: '', color:"#929191", data: data.filter(el => el.Этап === '') },
+      { id: 'lead', label: 'потенциальный клиент', value: 'потенциальный клиент', color:"#3f51b5", data: data.filter(el => el.Этап === 'потенциальный клиент') },
+      { id: 'preparation', label: 'подготовка документов', value: 'подготовка документов', color:"#af9e0b", data: data.filter(el => el.Этап === 'подготовка документов') },
+      { id: 'applied', label: 'заявление подано', value: 'заявление подано', color:"#439ce3", data: data.filter(el => el.Этап === 'заявление подано') },
+      { id: 'restructure', label: 'реструктуризация долгов', value: 'реструктуризация долгов', color:"#795548", data: data.filter(el => el.Этап === 'реструктуризация долгов') },
+      { id: 'sale', label: 'реализация имущества', value: 'реализация имущества', color:"#9c27b0", data: data.filter(el => el.Этап === 'реализация имущества') },
+      { id: 'suspended', label: 'банкротство приостановлено', value: 'банкротство приостановлено', color:"#f3296e", data: data.filter(el => el.Этап === 'банкротство приостановлено') },
+      { id: 'finished', label: 'банкротство завершено', value: 'банкротство окончено', color:"#17b766", data: data.filter(el => el.Этап === 'банкротство окончено') },
     ]
     :
     [];
@@ -129,7 +129,7 @@ function Kanban(props) {
                                 fontSize: 12,
                                 backgroundColor: snapshot.isDragging
                                   ? "#ff9800"
-                                  : "#3f51b5",
+                                  : stage.color,
                                 color: "white",
                                 ...provided.draggableProps.style
                               }}
