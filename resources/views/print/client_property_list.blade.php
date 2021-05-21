@@ -196,7 +196,7 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
         <td class="innerCell"></td>
         <td class="innerCell">{{$loop->iteration}}) {{$row->Наименование}}</td>
         <td class="innerCell">{{$row->ВидСобственности}}</td>
-        <td class="innerCell">{{$row->Адрес}}</td>
+        <td class="innerCell">{{$row->address->string}}</td>
         <td class="innerCell">{{$row->Площадь}}</td>
         <td class="innerCell">{{$row->ОснованиеПриобретения}}</td>
         <td class="innerCell">{{$row->СведенияОЗалоге}}</td>
@@ -263,7 +263,7 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
         <td class="innerCell">{{$loop->iteration}}) {{$row->Наименование}} {{$row->ГодВыпуска}}г.в.</td>
         <td class="innerCell">{{$row->ИдентификационныйНомер}}</td>
         <td class="innerCell">{{$row->ВидСобственности}}</td>
-        <td class="innerCell">{{$row->Адрес}}</td>
+        <td class="innerCell">{{$row->address->string}}</td>
         <td class="innerCell">{{$row->Стоимость}}</td>
         <td class="innerCell">{{$row->СведенияОЗалоге}}</td>
       </tr>
@@ -311,7 +311,7 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
       @foreach ($client->bankAccounts as $row)
       <tr>
         <td>{{"3".".".$loop->iteration}}</td>
-        <td>{{$row->bank->Наименование}} {{$row->bank->Адрес}}</td>
+        <td>{{$row->bank->Наименование}} {{$row->bank->address->string}}</td>
         <td>{{$row->ВидСчета}}, {{$row->ВалютаСчета}}</td>
         <td>{{dateFormat($row->ДатаОткрытия)}}</td>
         <td>{{$row->Остаток}}</td>

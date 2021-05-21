@@ -161,7 +161,7 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
     @endif
     транспортное средство, {{mb_strtolower($deal->dealable->Наименование, 'UTF-8')}} с идентификационным номером
     {{$deal->dealable->ИдентификационныйНомер}}
-    , расположенный (-ая) по адресу: {{$deal->dealable->Адрес}} что подтверждает {{$deal->Основание}}.
+    , расположенный (-ая) по адресу: {{$deal->dealable->address->string}} что подтверждает {{$deal->Основание}}.
     @elseif ($deal->dealable->type==='realty')
     @if ($deal->ВидСделки==='Покупка')
     мною приобретен
@@ -171,7 +171,7 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
     объект недвижимости, {{mb_strtolower($deal->dealable->Наименование, 'UTF-8')}} общей площадью
     {{$deal->dealable->Площадь}} кв.м.,
     расположенный (-ая) по адресу:
-    {{$deal->dealable->Адрес}} что подтверждает {{$deal->Основание}}.
+    {{$deal->dealable->address->string}} что подтверждает {{$deal->Основание}}.
     @endif
   </p>
   @endforeach
