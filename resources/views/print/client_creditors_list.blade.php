@@ -198,7 +198,7 @@ $fmt = numfmt_create( 'ru_RU', NumberFormatter::SPELLOUT );
         <td>{{"1".".".$loop->iteration}}</td>
         <td>{{$row->СодержаниеОбязательства}}</td>
         <td>{{$row->creditor->Наименование}}</td>
-        <td>{{$row->creditor->Адрес}}</td>
+        <td>{{$row->creditor->address->string}}</td>
         <td>{{$row->ОснованиеВозникновения}}</td>
         <td>{{$row->СуммаВсего}}</td>
         <td>{{$row->СуммаЗадолженность}}</td>
